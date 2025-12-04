@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>USUÁRIO - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<link rel="icon" type="image/png" href="Icon.jpg">
+
+<body class="bg-amber-100 flex h-screen">
+
+  <!-- Header (Mobile) -->
+  <header
+    class="fixed lg:hidden top-0 left-0 w-full bg-yellow-700 text-white flex items-center justify-between px-4 py-3 shadow-md z-40">
+    <button id="menuBtn" class="p-2 rounded-md focus:outline-none bg-yellow-800">
+      <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h1 class="font-semibold text-lg">Painel Administrativo</h1>
+  </header>
+
+  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-30 transition-opacity"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar"
+    class="fixed top-0 left-0 h-full w-64 bg-yellow-700 text-white flex flex-col justify-between shadow-xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out z-50">
+
+    <div>
+      <div class="flex justify-center items-center h-28 bg-yellow-800">
+        <img src="logo.jpg" alt="Logo"
+          class="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 rounded-2xl" />
+      </div>
+
+      <nav class="flex flex-col gap-3 p-5">
+        <a href="dashboard.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Home</a>
+        <a href="gerenciar-avaliacao.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Avaliação</a>
+        <a href="produtos.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Produtos</a>
+        <a href="usuarios.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Usuários</a>
+        <a href="promocao.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Promoção</a>
+        <a href="sobrenos.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Sobre Nós</a>
+        <a href="faq.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">FAQ</a>
+        <a href="gerenciar-banners.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Banner</a>
+        <a href="categorias.html"
+          class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Categoria</a>
+      </nav>
+    </div>
+
+    <button id="logoutBtn"
+      class="m-4 bg-red-600 hover:bg-red-700 py-2 rounded-xl text-center font-semibold transition-all">
+      Logout
+    </button>
+  </aside>
+
+  <main class="flex-1 p-8 overflow-y-auto mt-16 lg:mt-0">
+    <h1 class="text-3xl font-bold text-yellow-800 mb-6">Gerenciar Usuários</h1>
+
+    <div class="mb-4 flex items-center gap-2">
+  <input 
+    type="text" 
+    id="pesquisaUsuario" 
+    placeholder="Pesquisar por nome ou email..." 
+    class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+  />
+</div>
+
+
+    <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-yellow-600 text-black">
+            <th class="p-3">ID</th>
+            <th class="p-3">Nome</th>
+            <th class="p-3">Email</th>
+            <th class="p-3">CPF</th>
+            <th class="p-3">Telefone</th>
+            <th class="p-3">Tipo</th>
+            <th class="p-3 text-center">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaUsuarios" class="divide-y divide-gray-200"></tbody>
+      </table>
+    </div>
+  </main>
+
+
+  <script>
+    // === NOVO: FILTRAR USUÁRIOS ===
+const inputPesquisa = document.getElementById("pesquisaUsuario");
+const btnPesquisa = document.getElementById("btnPesquisarUsuario");
+
+function filtrarUsuarios() {
+  const filtro = inputPesquisa.value.toLowerCase();
+  const linhas = tabelaUsuarios.querySelectorAll("tr");
+
+  linhas.forEach(linha => {
+    const nome = linha.children[1].textContent.toLowerCase();
+    const email = linha.children[2].textContent.toLowerCase();
+
+    if (nome.includes(filtro) || email.includes(filtro)) {
+      linha.style.display = "";
+    } else {
+      linha.style.display = "none";
+    }
+  });
+}
+
+// Evento de busca ao digitar
+inputPesquisa.addEventListener("input", filtrarUsuarios);
+
+// Evento de busca ao clicar no botão
+btnPesquisa.addEventListener("click", filtrarUsuarios);
+
+  </script>
+  <!-- Script do menu lateral -->
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    const overlay = document.getElementById('overlay');
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('translate-x-0');
+      if (isOpen) {
+        sidebar.classList.replace('translate-x-0', '-translate-x-full');
+        overlay.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      } else {
+        sidebar.classList.replace('-translate-x-full', 'translate-x-0');
+        overlay.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+      }
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.replace('translate-x-0', '-translate-x-full');
+      overlay.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+  </script>
+
+  <script>
+    // === CONFIG SUPABASE ===
+    const SUPABASE_URL = "https://ulxbfffiidjlartupase.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const tabelaUsuarios = document.getElementById("tabelaUsuarios");
+
+    // === VERIFICAR LOGIN ADMIN ===
+    async function verificarLoginDashboard() {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      const emailUsuario = localStorage.getItem("emailUsuario");
+
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "../cadastro/login.html";
+        return;
+      }
+
+      if (emailUsuario) {
+        const { data: usuarioData, error } = await supabase
+          .from("usuario")
+          .select("tipo, nome, senha")
+          .eq("email", emailUsuario)
+          .single();
+
+        if (error || !usuarioData || usuarioData.tipo !== "Administrador") {
+          alert("Acesso negado. Apenas administradores podem acessar.");
+          window.location.href = "../cadastro/login.html";
+          return;
+        }
+
+        window.adminData = usuarioData; // Guarda dados do admin logado
+      }
+    }
+
+    // === CARREGAR USUÁRIOS ===
+    async function carregarUsuarios() {
+      tabelaUsuarios.innerHTML = `<tr><td colspan="7" class="text-center text-yellow-800 font-semibold p-3">Carregando...</td></tr>`;
+
+      const { data, error } = await supabase
+        .from("usuario")
+        .select("*")
+        .order("tipo", { ascending: false })
+        .order("id_usuario", { ascending: true });
+
+      if (error) {
+        console.error("Erro ao carregar usuários:", error);
+        tabelaUsuarios.innerHTML = `<tr><td colspan="7" class="text-center text-red-600 p-3">Erro ao carregar usuários</td></tr>`;
+        return;
+      }
+
+      tabelaUsuarios.innerHTML = "";
+
+      data.forEach(u => {
+        const linha = document.createElement("tr");
+        linha.classList.add("hover:bg-yellow-50", "transition");
+
+        const isAdmin = u.tipo === "Administrador";
+
+        linha.innerHTML = `
+          <td class="p-3">${u.id_usuario}</td>
+          <td class="p-3">${u.nome}</td>
+          <td class="p-3">${u.email}</td>
+          <td class="p-3">${u.cpf}</td>
+          <td class="p-3">${u.telefone ?? "-"}</td>
+          <td class="p-3 font-semibold ${isAdmin ? "text-green-700" : "text-gray-700"}">${u.tipo}</td>
+          <td class="p-3 text-center flex flex-wrap gap-2 justify-center">
+            ${
+              isAdmin
+                ? `<button onclick="rebaixarUsuario(${u.id_usuario})" class="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded-full">Rebaixar</button>`
+                : `<button onclick="promoverUsuario(${u.id_usuario})" class="bg-yellow-700 hover:bg-yellow-800 text-white py-1 px-3 rounded-full">Promover</button>`
+            }
+            <button onclick="editarUsuario(${u.id_usuario})" class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-full">Editar</button>
+            <button onclick="excluirUsuario(${u.id_usuario})" class="bg-gray-700 hover:bg-gray-800 text-white py-1 px-3 rounded-full">Excluir</button>
+          </td>
+        `;
+        tabelaUsuarios.appendChild(linha);
+      });
+    }
+
+    async function promoverUsuario(id) {
+      if (!confirm("Deseja realmente promover este usuário a Administrador?")) return;
+      const { error } = await supabase.from("usuario").update({ tipo: "Administrador" }).eq("id_usuario", id);
+      if (error) alert("Erro ao promover: " + error.message);
+      else carregarUsuarios();
+    }
+
+    async function rebaixarUsuario(id) {
+      if (!confirm("Deseja realmente rebaixar este administrador para Cliente?")) return;
+      const { error } = await supabase.from("usuario").update({ tipo: "Cliente" }).eq("id_usuario", id);
+      if (error) alert("Erro ao rebaixar: " + error.message);
+      else carregarUsuarios();
+    }
+
+    // === NOVO: EXCLUIR USUÁRIO ===
+    async function excluirUsuario(id) {
+  // Solicita a senha do administrador
+  const senhaAdmin = prompt("Digite sua senha de administrador para confirmar a exclusão:");
+  if (!senhaAdmin) return;
+
+  if (senhaAdmin !== window.adminData.senha) {
+    alert("Senha incorreta! Exclusão cancelada.");
+    return;
+  }
+
+  // Confirmação adicional
+  if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
+
+  const { error } = await supabase.from("usuario").delete().eq("id_usuario", id);
+  if (error) alert("Erro ao excluir: " + error.message);
+  else {
+    alert("Usuário excluído com sucesso!");
+    carregarUsuarios();
+  }
+}
+
+
+    // === NOVO: EDITAR USUÁRIO COM SENHA DE ADMIN ===
+    async function editarUsuario(id) {
+      const senhaAdmin = prompt("Digite sua senha de administrador para confirmar a edição:");
+      if (!senhaAdmin) return;
+
+      if (senhaAdmin !== window.adminData.senha) {
+        alert("Senha incorreta! Edição cancelada.");
+        return;
+      }
+
+      const { data: usuario, error } = await supabase
+        .from("usuario")
+        .select("*")
+        .eq("id_usuario", id)
+        .single();
+
+      if (error || !usuario) {
+        alert("Erro ao buscar usuário.");
+        return;
+      }
+
+      const novoNome = prompt("Novo nome:", usuario.nome);
+      const novoEmail = prompt("Novo email:", usuario.email);
+      const novoTelefone = prompt("Novo telefone:", usuario.telefone ?? "");
+      const novoTipo = prompt("Novo tipo (Administrador/Cliente):", usuario.tipo);
+
+      if (!novoNome || !novoEmail) {
+        alert("Nome e email são obrigatórios!");
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from("usuario")
+        .update({
+          nome: novoNome,
+          email: novoEmail,
+          telefone: novoTelefone,
+          tipo: novoTipo
+        })
+        .eq("id_usuario", id);
+
+      if (updateError) alert("Erro ao atualizar usuário: " + updateError.message);
+      else {
+        alert("Usuário atualizado com sucesso!");
+        carregarUsuarios();
+      }
+    }
+
+    // === INICIALIZAÇÃO ===
+    verificarLoginDashboard().then(() => carregarUsuarios());
+  </script>
+
+  <script>
+  // Função de logout
+  function logout() {
+    // Remove os dados do usuário do localStorage
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("emailUsuario");
+    localStorage.removeItem("nomeUsuario"); // se você estiver armazenando também
+
+    // Mensagem de confirmação
+    alert("Você saiu com sucesso!");
+
+    // Redireciona para a página de login
+    window.location.href = "../cadastro/login.html";
+  }
+
+  // Adiciona o evento ao botão de logout
+  const btnLogout = document.getElementById("logoutBtn");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", logout);
+  }
+</script>
+</body>
+</html>

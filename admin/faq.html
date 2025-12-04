@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<link rel="icon" type="image/png" href="Icon.jpg">
+
+<body class="bg-amber-100 flex h-screen">
+
+  <!-- Header (Mobile) -->
+  <header
+    class="fixed lg:hidden top-0 left-0 w-full bg-yellow-700 text-white flex items-center justify-between px-4 py-3 shadow-md z-40">
+    <button id="menuBtn" class="p-2 rounded-md focus:outline-none bg-yellow-800">
+      <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h1 class="font-semibold text-lg">Painel Administrativo</h1>
+  </header>
+
+  <!-- Overlay escurecido ao abrir o menu -->
+  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-30 transition-opacity"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar"
+  class="fixed top-0 left-0 h-full w-64 bg-yellow-700 text-white flex flex-col justify-between shadow-xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out z-50">
+
+  <div>
+    <!-- Logo -->
+    <div class="flex justify-center items-center h-28 bg-yellow-800">
+      <img 
+        src="logo.jpg" 
+        alt="Logo" 
+        class="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 rounded-2xl"
+      />
+    </div>
+
+    <!-- Navegação -->
+    <nav class="flex flex-col gap-3 p-5">
+      <a href="dashboard.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Home</a>
+      <a href="gerenciar-avaliacao.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Avaliação</a>
+      <a href="produtos.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Produtos</a>
+      <a href="usuarios.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Usuários</a>
+      <a href="promocao.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Promoção</a>
+      <a href="sobrenos.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Sobre Nós</a>
+      <a href="faq.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">FAQ</a>
+      <a href="gerenciar-banners.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Banner</a>
+      <a href="categorias.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Categoria</a>
+    </nav>
+  </div>
+
+  <button id="logoutBtn"
+    class="m-4 bg-red-600 hover:bg-red-700 py-2 rounded-xl text-center font-semibold transition-all">
+    Logout
+  </button>
+</aside>
+
+  <!-- Main -->
+  <main id="mainContent" class="flex-1 bg-amber-100 p-8 mt-16 lg:mt-0 transition-all duration-300 ease-in-out lg:ml-0">
+    <h1 class="text-3xl font-bold text-yellow-800 mb-6">Gerenciar FAQ</h1>
+
+    <!-- Saudação -->
+    <h2 id="saudacaoUsuario" class="text-xl font-semibold text-yellow-900 mb-4"></h2>
+
+    <!-- Formulário Adicionar FAQ -->
+    <form id="formAddFAQ" 
+          class="bg-yellow-50 p-6 rounded-xl shadow-lg mb-8 flex flex-col gap-4 max-w-md mx-auto">
+      <h2 class="text-2xl font-bold text-yellow-800 text-center">Adicionar nova pergunta</h2>
+
+      <!-- Pergunta -->
+      <input id="novaPergunta" type="text" placeholder="Pergunta"
+             class="border border-yellow-600 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-600 bg-white shadow-sm"
+             required>
+
+      <!-- Resposta -->
+      <textarea id="novaResposta" placeholder="Resposta" rows="4"
+                class="border border-yellow-600 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-yellow-600 bg-white shadow-sm resize-none"
+                required></textarea>
+
+      <!-- Botão -->
+      <button type="submit"
+              class="bg-yellow-700 text-white rounded-full py-3 font-semibold hover:bg-yellow-800 transition-all duration-200 shadow-md">
+        Adicionar FAQ
+      </button>
+    </form>
+
+    <!-- Lista de Perguntas -->
+    <div id="faqContainer" class="space-y-4"></div>
+  </main>
+
+  <script>
+  // Função de logout
+  function logout() {
+    // Remove os dados do usuário do localStorage
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("emailUsuario");
+    localStorage.removeItem("nomeUsuario"); // se você estiver armazenando também
+
+    // Mensagem de confirmação
+    alert("Você saiu com sucesso!");
+
+    // Redireciona para a página de login
+    window.location.href = "../cadastro/login.html";
+  }
+
+  // Adiciona o evento ao botão de logout
+  const btnLogout = document.getElementById("logoutBtn");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", logout);
+  }
+</script>
+
+
+  <!-- Script do menu lateral -->
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    const overlay = document.getElementById('overlay');
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('translate-x-0');
+      if (isOpen) {
+        sidebar.classList.replace('translate-x-0', '-translate-x-full');
+        overlay.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      } else {
+        sidebar.classList.replace('-translate-x-full', 'translate-x-0');
+        overlay.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+      }
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.replace('translate-x-0', '-translate-x-full');
+      overlay.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+  </script>
+
+<script>
+  const URL_SUPABASE = 'https://ulxbfffiidjlartupase.supabase.co';
+  const KEY_SUPABASE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ';
+  const supabase = window.supabase.createClient(URL_SUPABASE, KEY_SUPABASE);
+
+  const faqContainer = document.getElementById("faqContainer");
+  const formAddFAQ = document.getElementById("formAddFAQ");
+
+  // 🔐 Verificar login + administrador
+  async function verificarLoginDashboard() {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const nomeUsuario = localStorage.getItem("nomeUsuario");
+    const emailUsuario = localStorage.getItem("emailUsuario");
+
+    // Se não estiver logado → volta pro login
+    if (!isLoggedIn || isLoggedIn !== "true") {
+      window.location.href = "../cadastro/login.html";
+      return false;
+    }
+
+    // Busca usuário no banco
+    if (emailUsuario) {
+      const { data: usuarioData, error } = await supabase
+        .from("usuario")
+        .select("tipo, nome")
+        .eq("email", emailUsuario)
+        .single();
+
+      // Se erro ou não encontrado
+      if (error || !usuarioData) {
+        console.error("Erro ao buscar usuário:", error);
+        window.location.href = "../cadastro/login.html";
+        return false;
+      }
+
+      // 🚫 Se não for administrador, bloqueia o acesso
+      if (usuarioData.tipo !== "Administrador") {
+        alert("Acesso negado. Somente administradores podem acessar esta página.");
+        window.location.href = "../cadastro/login.html";
+        return false;
+      }
+
+      // ✅ Saudação personalizada
+      const saudacao = document.getElementById("saudacaoUsuario");
+      if (saudacao) {
+        saudacao.textContent = `Olá, ${usuarioData.nome || nomeUsuario || "Administrador"} 👋`;
+      }
+    }
+
+    return true;
+  }
+
+  // === Função: Carregar FAQs ===
+  async function carregarFAQs() {
+    faqContainer.innerHTML = "<p class='text-gray-600'>Carregando...</p>";
+    const { data, error } = await supabase.from("faq").select("*").order("id_question", { ascending: true });
+
+    if (error) {
+      faqContainer.innerHTML = `<p class='text-red-600'>Erro ao carregar FAQs.</p>`;
+      return;
+    }
+
+    if (data.length === 0) {
+      faqContainer.innerHTML = `<p class='text-gray-700 italic'>Nenhuma pergunta cadastrada ainda.</p>`;
+      return;
+    }
+
+    faqContainer.innerHTML = "";
+    data.forEach(faq => {
+      const card = document.createElement("div");
+      card.className = "bg-yellow-200 p-4 rounded-lg shadow-md flex flex-col gap-2";
+
+      card.innerHTML = `
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-yellow-900">${faq.question}</h3>
+          <div class="flex gap-2">
+            <button class="editar bg-blue-600 text-white px-3 py-1 rounded-full hover:bg-blue-700" data-id="${faq.id_question}">Editar</button>
+            <button class="excluir bg-red-600 text-white px-3 py-1 rounded-full hover:bg-red-700" data-id="${faq.id_question}">Excluir</button>
+          </div>
+        </div>
+        <p class="text-black">${faq.answer}</p>
+      `;
+      faqContainer.appendChild(card);
+    });
+
+    adicionarEventosBotoes();
+  }
+
+  // === Adicionar FAQ ===
+  formAddFAQ.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const question = document.getElementById("novaPergunta").value.trim();
+    const answer = document.getElementById("novaResposta").value.trim();
+
+    if (!question || !answer) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    const { error } = await supabase.from("faq").insert([{ question, answer }]);
+    if (error) {
+      alert("Erro ao adicionar FAQ!");
+      return;
+    }
+
+    formAddFAQ.reset();
+    carregarFAQs();
+  });
+
+  // === Editar / Excluir ===
+  function adicionarEventosBotoes() {
+    document.querySelectorAll(".editar").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const pergunta = prompt("Nova pergunta:");
+        const resposta = prompt("Nova resposta:");
+        if (pergunta && resposta) {
+          const { error } = await supabase
+            .from("faq")
+            .update({ question: pergunta, answer: resposta })
+            .eq("id_question", id);
+          if (error) alert("Erro ao editar FAQ!");
+          else carregarFAQs();
+        }
+      });
+    });
+
+    document.querySelectorAll(".excluir").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        if (confirm("Tem certeza que deseja excluir esta FAQ?")) {
+          const { error } = await supabase.from("faq").delete().eq("id_question", id);
+          if (error) alert("Erro ao excluir FAQ!");
+          else carregarFAQs();
+        }
+      });
+    });
+  }
+
+  // 🚀 Inicialização
+  (async () => {
+    const logado = await verificarLoginDashboard();
+    if (logado) await carregarFAQs();
+  })();
+</script>
+
+
+</body>
+</html>

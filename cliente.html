@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transição 3D para Conteúdo</title>
+
+  <!-- Fonte diferenciada -->
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+
+  <style>
+    /* === Carrossel === */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      margin-top: 30px;
+      overflow: hidden;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 20px;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel-item {
+      flex: 0 0 auto;
+      width: 250px;
+      background-color: #7B4B24;
+      color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .carousel-item:hover {
+      transform: scale(1.05);
+    }
+
+    .produto-imagem {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .produto-info {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .produto-info h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #ffd54f;
+    }
+
+    .produto-info p {
+      font-size: 14px;
+      margin: 10px 0;
+      color: #fff;
+    }
+
+    .botao-comprar {
+      background-color: #d4a017;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .botao-comprar:hover {
+      background-color: #b3820f;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.5);
+      color: white;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      z-index: 10;
+    }
+
+    .arrow.left { left: 10px; }
+    .arrow.right { right: 10px; }
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      background-color: #e0ccac;
+      font-family: Arial, sans-serif;
+      color: #000;
+    }
+
+    /* Container do 3D */
+    #container3D {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 12px;
+      z-index: 10;
+    }
+
+    /* Conteúdo interno (loja) */
+    #conteudo {
+      width: 100%;
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 1s ease;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      overflow-y: auto;
+      top: 0;
+      left: 0;
+      z-index: 5;
+    }
+
+    #conteudo.show {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 20;
+    }
+
+    /* Cabeçalho */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: #7B4B24;
+      color: #fff;
+    }
+
+    header h1 { 
+      margin: 0; 
+      font-size: 28px; 
+      color: yellow; 
+      font-family: 'Lobster', cursive; 
+    }
+
+    header nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    header nav a:hover { 
+      text-decoration: underline; 
+    }
+
+    .item {
+      border-color: #7B4B24;
+    }
+
+    /* Carrossel 3D */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    .transform-style-preserve-3d {
+      transform-style: preserve-3d;
+    }
+
+    .sla{
+      z-index: -1000;
+    }
+
+    /* Botões do carrossel */
+    #prev3D, #next3D {
+      background-color: rgba(0,0,0,0.4);
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: white;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    #prev3D:hover, #next3D:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+.faq-item {
+  background: #7B4B24;
+  color: white;
+  width: 100%;       /* ocupa 100% do container, ou seja, 80% da tela */
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 20px 25px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.faq-item:hover {
+  background: #985600;
+}
+
+.faq-item .answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  padding: 0;
+}
+
+.faq-item.active .answer {
+  max-height: 1000px; /* garante que qualquer resposta caiba */
+  padding: 10px 0;
+}
+
+
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+  <div id="container3D"></div>
+
+  <!-- Conteúdo da Loja -->
+  <div id="conteudo" class="hidden overflow-x-hidden">
+    <header>
+      <h1>Marcelino's</h1>
+      <nav class="flex gap-4">
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Home</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Produtos</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Promoções</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Sobre Nós</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">FAQ</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Login</a>
+        </div>
+        <div class="item rounded-xl p-2 border" style="background-color: #985600;">
+          <a href="#" style="text-decoration: none; color: wheat;">Cadastro</a>
+        </div>
+      </nav>
+    </header>
+    
+
+    <!-- Grid de Conteúdo -->
+    <div class="grid gap-4 p-4" style="grid-template-columns: 39% 69%; height: 50vh;">
+      <!-- Coluna esquerda -->
+      <div class="flex flex-col rounded-xl items-center justify-center">
+        <div style="width: 50%;" class="mt-4 text-center">
+          <h3 class="text-yellow-500 text-5xl font-bold">Bem Vindo a Marcelino's</h3>
+          <p class="text-white text-xl font-bold mt-4">Aqui você encontra comidas frescas e apetitosas!</p>
+        </div>
+      </div>
+
+      <!-- Coluna direita: Carrossel 3D -->
+      <div class="sla flex items-center justify-center z-0 overflow-hidden relative">
+        <div class="background-shape absolute -z-10"
+             style="width: 70%; height: 70%; background-color: #d4a017; top: 80%; left: 50%;
+                    transform: translate(-50%, -50%) rotate(-15deg);
+                    clip-path: ellipse(70% 40% at 50% 50%);">
+        </div>
+
+        <div class="relative w-full h-64 perspective-1000">
+          <div id="carousel3D" class="w-full h-96 relative transform-style-preserve-3d transition-transform duration-700 top-[-20%]">
+            <!-- 4 itens -->
+            <div class="absolute w-full h-full flex items-center justify-center" style="transform: rotateX(0deg) translateZ(200px);">
+              <img src="hamburguer.png" class="w-55" alt="">
+            </div>
+            <div class="absolute w-full h-full flex items-center justify-center" style="transform: rotateX(90deg) translateZ(200px);">
+              <img src="hamburguer.png" class="w-55" alt="">
+            </div>
+            <div class="absolute w-full h-full flex items-center justify-center" style="transform: rotateX(180deg) translateZ(200px);">
+              <img src="hamburguer.png" class="w-55" alt="">
+            </div>
+            <div class="absolute w-full h-full flex items-center justify-center" style="transform: rotateX(270deg) translateZ(200px);">
+              <img src="hamburguer.png" class="w-55" alt="">
+            </div>
+          </div>
+        </div>
+
+        <!-- Botões -->
+        <button id="prev3D">&#10094;</button>
+        <button id="next3D">&#10095;</button>
+      </div>
+    </div>
+    <div class="flex flex-col rounded-xl items-center justify-center mt-4">
+      <div class="carousel-container">
+        <button class="arrow left">&#10094;</button>
+        <div class="carousel" id="carousel"></div>
+        <button class="arrow right">&#10095;</button>
+      </div>
+    </div>
+
+<!-- Seção FAQ -->
+<div class="faq-container" style="width: 50%; margin: 50px auto; display: flex; flex-direction: column; align-items: center; background-color: #e0ccac; padding: 30px 20px; border-radius: 12px;">
+  <h2 style="font-family: 'Lobster', cursive; color: #7B4B24; font-size: 32px; margin-bottom: 20px;">Perguntas Frequentes</h2>
+  <div id="faqQ" style="width: 100%;"></div>
+</div>
+
+
+  <!-- === Scripts === -->
+  
+
+    <!-- Conteúdo adicional da loja -->
+    <div class="relative flex flex-col md:flex-row gap-4 p-4 items-center justify-center overflow-hidden">
+      <div class="absolute w-80 h-80 bg-yellow-500 rounded-full top-1/2 left-[23%] -translate-x-1/2 -translate-y-[35%] -z-10"></div>
+
+      <div class="flex-1">
+        <img src="https://www.caixa.gov.br/PublishingImages/Paginas/LT_T015/header_330x315.png" alt="" class="mx-auto" style="width: 120vw; height: auto; max-width: 400px;">
+      </div>
+
+      <section class="py-8 px-4 md:px-12 bg-[#e0ccac] text-[#3b2a1a flex-1 mt-5">
+        <div class="max-w-5xl mx-auto text-center">
+          <h2 class="text-2xl font-bold mb-2" style="font-family: 'Lobster', cursive;">
+            Mais Que Uma Conveniência
+          </h2>
+          <p class="text-sm max-w-xl mx-auto mb-6 text-[#4b3825] leading-relaxed" id="abtus">
+           
+          </p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Script do Carrossel 3D contínuo -->
+  <script>
+    const carousel3D = document.getElementById('carousel3D');
+    let rotationX = 0; // ângulo acumulativo
+    const rotateStep = 90; // cada item 90°
+
+    function rotateNext() {
+      rotationX -= rotateStep;
+      carousel3D.style.transform = `translateZ(200px) rotateX(${rotationX}deg)`;
+    }
+
+    function rotatePrev() {
+      rotationX += rotateStep;
+      carousel3D.style.transform = `translateZ(200px) rotateX(${rotationX}deg)`;
+    }
+
+    document.getElementById('next3D').addEventListener('click', rotateNext);
+    document.getElementById('prev3D').addEventListener('click', rotatePrev);
+
+    // Auto-rotate contínuo
+    setInterval(rotateNext, 3000);
+  </script>  <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+      // 🔹 Suas credenciais do Supabase
+      const SUPABASE_URL ='https://ulxbfffiidjlartupase.supabase.co';
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ";
+
+      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      const carousel = document.getElementById('carousel');
+
+     async function carregarProdutosPromocao() {
+  // 🔹 Busca itens que estão em promoção
+  const { data, error } = await supabase
+    .from('promocao')
+    .select(`
+      desconto,
+      item: item_id(*)  -- Faz join com a tabela 'item'
+    `);
+
+  if (error) {
+    console.error('Erro ao carregar produtos em promoção:', error);
+    return;
+  }
+
+  carousel.innerHTML = ''; // Limpa antes de inserir
+
+  data.forEach(registro => {
+    const produto = registro.item; // dados do item
+    const desconto = registro.desconto;
+
+    // Calcula o preço promocional
+    const precoOriginal = produto.preco;
+    const precoPromocional = (precoOriginal * (1 - desconto / 100)).toFixed(2);
+
+    const card = document.createElement('div');
+    card.classList.add('carousel-item');
+
+    card.innerHTML = `
+      <img src="${produto.imagem}" alt="${produto.nome}" class="produto-imagem">
+      <div class="produto-info">
+        <h3>${produto.nome}</h3>
+        <p>${produto.descricao}</p>
+        <p>
+          <span style="text-decoration: line-through; color: #ffd54f;">R$ ${precoOriginal}</span>
+          <span style="color: black; font-weight: bold; margin-left: 10px;">R$ ${precoPromocional}</span>
+        </p>
+        <button class="botao-comprar">Comprar</button>
+      </div>
+    `;
+
+    carousel.appendChild(card);
+  });
+}
+
+carregarProdutosPromocao();
+
+        async function carregarSobreNos() {
+    const abtusText = document.getElementById('abtus');
+    if (!abtusText) return;
+
+    const { data, error } = await supabase.from('abtus').select('descricao').limit(1).single();
+
+    if (error) {
+      console.error('Erro ao carregar texto de Sobre Nós:', error);
+      abtusText.textContent = 'Não foi possível carregar as informações.';
+      return;
+    }
+
+    // Supomos que a tabela abtus tenha uma coluna chamada descricao
+    abtusText.textContent = data.descricao || 'Informações não encontradas.';
+  }
+
+  // 🔸 Executar ao carregar a página
+  document.addEventListener('DOMContentLoaded', () => {
+
+    carregarSobreNos();
+    
+  });
+   async function carregarFAQ() {
+  const container = document.getElementById("faqQ");
+  container.innerHTML = "Carregando perguntas...";
+
+  // 🔍 Busca os dados da tabela 'faq'
+  const { data, error } = await supabase
+    .from("faq")
+    .select("question, answer")
+    .order("id_question", { ascending: true }); // ou "question" se não tiver id
+
+  if (error) {
+    console.error("Erro ao buscar FAQ:", error);
+    container.innerHTML = "<p>Erro ao carregar perguntas.</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    container.innerHTML = "<p>Nenhuma pergunta encontrada.</p>";
+    return;
+  }
+
+  // 🧱 Monta o HTML dinamicamente
+  container.innerHTML = "";
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "faq-item";
+    div.innerHTML = `
+      <div class="question">${item.question}</div>
+      <div class="answer">${item.answer}</div>
+    `;
+    
+    // ✅ Adiciona evento de clique para abrir/fechar resposta
+    div.querySelector(".question").addEventListener("click", () => {
+      div.classList.toggle("active");
+    });
+
+    container.appendChild(div);
+  });
+}
+
+    
+
+    // 🚀 Executa quando a página carrega
+    carregarFAQ();
+      </script>
+
+  <script type="module" src="comeco.js"></script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro & Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="LoginOlho.js"></script>
+  <script defer src="passwordHidden.js"></script>
+  <script defer src="validacaoCadastro.js"></script>
+  <link rel="stylesheet" href="styleLogin.css">
+</head>
+
+<link rel="icon" type="image/png" href="../admin/Icon.jpg">
+
+<body class="flex items-center justify-center min-h-screen">
+
+  <div id="container" class="glass-card w-full max-w-md p-8">
+    <h1 id="formTitle" class="text-3xl font-bold text-center mb-6 text-white drop-shadow-lg">Cadastro</h1>
+
+    <!-- Cadastro -->
+    <form id="cadastroForm" class="space-y-4">
+      <!-- Nome -->
+      <div class="relative">
+        <input id="nome" type="text" placeholder="Seu nome"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:placeholder-gray-400 focus:outline-none"
+          required />
+        <label for="nome" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          Nome
+        </label>
+      </div>
+
+      <!-- Email -->
+      <div class="relative">
+        <input id="email-cadastro" type="email" placeholder="exemplo@email.com"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:placeholder-gray-400 focus:outline-none"
+          required />
+        <label for="email-cadastro" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          Email
+        </label>
+      </div>
+
+      <!-- Telefone -->
+      <div class="relative">
+        <input id="telefone" type="tel" placeholder="(11) 91234-5678"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:placeholder-gray-400 focus:outline-none" />
+        <label for="telefone" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          Telefone
+        </label>
+      </div>
+
+      <!-- CPF -->
+      <div class="relative">
+        <input id="cpf" type="text" placeholder="000.000.000-00"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:placeholder-gray-400 focus:outline-none" />
+        <label for="cpf" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          CPF
+        </label>
+      </div>
+
+      <!-- Senha -->
+      <div class="relative">
+        <input id="senha-cadastro" type="password" placeholder="Digite sua senha"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:placeholder-gray-400 focus:outline-none"
+          required />
+        <label for="senha-cadastro" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          Senha
+        </label>
+        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-200"
+          onclick="toggleSenha('senha-cadastro', this)">
+          <img id="eyeIcon" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" width="24" />
+        </button>
+      </div>
+
+      <!-- Confirmar Senha -->
+      <div class="relative">
+        <input id="confirmar-senha" type="password" placeholder="Repita sua senha"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:outline-none"
+          required />
+        <label for="confirmar-senha" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">
+          Confirmar Senha
+        </label>
+        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-200"
+          onclick="toggleSenha('confirmar-senha', this)">
+          <img id="eyeIcon" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" width="24" />
+        </button>
+      </div>
+
+      <!-- Termos de Uso e Política de Privacidade -->
+      <div class="mb-4 flex flex-col space-y-3 text-white">
+        <label class="flex items-center space-x-3 cursor-pointer">
+          <input type="checkbox" id="termos" required class="check-custom h-5 w-5 rounded border-gray-300">
+          <span class="text-sm">Li e aceito os
+            <a href="../footer/termos-de-uso.html" target="_blank" class="text-amber-600 hover:text-amber-400 transition">Termos de Uso</a>
+          </span>
+        </label>
+        <label class="flex items-center space-x-3 cursor-pointer">
+          <input type="checkbox" id="privacidade" required class="check-custom h-5 w-5 rounded border-gray-300">
+          <span class="text-sm">Li e aceito a
+            <a href="../footer/politica-de-privacidade.html" target="_blank" class="text-amber-600 hover:text-amber-400 transition">Política de Privacidade</a>
+          </span>
+        </label>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-md transition">
+        Cadastrar
+      </button>
+    </form>
+
+    <!-- Login -->
+    <form id="loginForm" class="space-y-4 hidden">
+      <div class="relative">
+        <input id="email-login" type="email" placeholder="seu@email.com"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:outline-none" required />
+        <label for="email-login" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">Email</label>
+      </div>
+      <div class="relative">
+        <input id="senha-login" type="password" placeholder="Digite sua senha"
+          class="peer w-full rounded-lg p-3 bg-white/50 placeholder-transparent focus:outline-none" required />
+        <label for="senha-login" class="absolute left-3 top-3 text-gray-700 transition-all
+         peer-placeholder-shown:top-3 peer-placeholder-shown:text-gray-500 peer-placeholder-shown:text-base
+         peer-focus:-top-3 peer-focus:text-sm peer-focus:text-amber-600
+         peer-[&:not(:placeholder-shown)]:-top-3 peer-[&:not(:placeholder-shown)]:text-sm peer-[&:not(:placeholder-shown)]:text-amber-600
+         px-1 rounded">Senha</label>
+        <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-200"
+          onclick="toggleSenha('senha-login', this)">
+          <img id="eyeIcon" src="https://img.icons8.com/?size=100&id=85028&format=png&color=000000" width="24" />
+        </button>
+      </div>
+      <button type="submit"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg shadow-md transition">
+        Entrar
+      </button>
+    </form>
+
+    <p class="text-center mt-6 text-amber-600">
+      <button id="toggleBtn" class="font-semibold hover:text-amber-400">
+        Já tem conta? Faça login
+      </button>
+    </p>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const URL_SUPABASE = 'https://ulxbfffiidjlartupase.supabase.co';
+    const KEY_SUPABASE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ';
+    const cliente = createClient(URL_SUPABASE, KEY_SUPABASE);
+
+    async function verificarUser(email, cpf) {
+      if (!email && !cpf) return { emailExiste: false, cpfExiste: false };
+      const { data: dataEmail } = await cliente.from('usuario').select('id_usuario').eq('email', email);
+      const { data: dataCpf } = await cliente.from('usuario').select('id_usuario').eq('cpf', cpf);
+      return {
+        emailExiste: dataEmail && dataEmail.length > 0,
+        cpfExiste: dataCpf && dataCpf.length > 0
+      };
+    }
+
+    async function setUser(nome, email, cpf, telefone, tipo, senha, confirmarSenha) {
+      if (!nome || !email || !cpf || !telefone || !senha || !confirmarSenha) {
+        alert('Existem informações faltando');
+        return;
+      }
+      if (senha !== confirmarSenha) {
+        alert('As senhas não coincidem');
+        return;
+      }
+      const { emailExiste, cpfExiste } = await verificarUser(email, cpf);
+      if (emailExiste) { alert('Erro: Este e-mail já está cadastrado.'); return; }
+      if (cpfExiste) { alert('Erro: Este CPF já está cadastrado.'); return; }
+
+      const { data, error } = await cliente.from('usuario').insert([{ nome, email, cpf, telefone, tipo, senha }]);
+      if (error) alert('Erro ao cadastrar usuario: ' + error.message);
+    }
+
+    // Adiciona listener ao formulário
+    const cadastroForm = document.getElementById('cadastroForm');
+    cadastroForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const email = document.getElementById('email-cadastro').value;
+      const cpf = document.getElementById('cpf').value;
+      const telefone = document.getElementById('telefone').value;
+      const senha = document.getElementById('senha-cadastro').value;
+      const confirmar = document.getElementById('confirmar-senha').value;
+
+      await setUser(nome, email, cpf, telefone, 'Cliente', senha, confirmar);
+    });
+
+    // Toggle entre cadastro/login
+    const toggleBtn = document.getElementById('toggleBtn');
+    const loginForm = document.getElementById('loginForm');
+    const formTitle = document.getElementById('formTitle');
+
+    toggleBtn.addEventListener('click', () => {
+      const isLoginVisible = !loginForm.classList.contains('hidden');
+      if (isLoginVisible) {
+        loginForm.classList.add('hidden');
+        cadastroForm.classList.remove('hidden');
+        formTitle.textContent = 'Cadastro';
+        toggleBtn.textContent = 'Já tem conta? Faça login';
+      } else {
+        loginForm.classList.remove('hidden');
+        cadastroForm.classList.add('hidden');
+        formTitle.textContent = 'Login';
+        toggleBtn.textContent = 'Não tem conta? Cadastre-se';
+      }
+    });
+   // Função para login
+async function loginUser(email, senha) {
+  if (!email || !senha) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+
+  // Busca usuário pelo email
+  const { data: usuario, error } = await cliente
+    .from('usuario')
+    .select('*')
+    .eq('email', email)
+    .single();
+
+  if (error || !usuario) {
+    alert("Usuário não encontrado.");
+    return;
+  }
+
+  // Verifica senha
+  if (usuario.senha !== senha) {
+    alert("Senha incorreta.");
+    return;
+  }
+  const usuarioId = localStorage.getItem("usuario_id");
+
+
+// 🔹 Salvar dados do usuário no localStorage
+localStorage.setItem("isLoggedIn", "true");
+localStorage.setItem("usuario_id", usuario.id_usuario); // <- ESSENCIAL
+localStorage.setItem("nomeUsuario", usuario.nome);
+localStorage.setItem("emailUsuario", usuario.email);
+localStorage.setItem("tipoUsuario", usuario.tipo);
+
+  // Redireciona conforme o tipo
+  if (usuario.tipo === 'Administrador') {
+    window.location.href = '../admin/dashboard.html';
+  } else {
+    window.location.href = "../../Marcelinostestes/inicio/3d/comeco/teste_pagina.html";
+  }
+}
+
+
+// Adiciona listener ao formulário de login
+const loginFormElement = document.getElementById('loginForm');
+loginFormElement.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const email = document.getElementById('email-login').value;
+  const senha = document.getElementById('senha-login').value;
+
+  await loginUser(email, senha);
+});
+
+  </script>
+
+</body>
+</html>

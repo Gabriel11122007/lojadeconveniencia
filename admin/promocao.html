@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PROMOÇÃO - Dashboard</title>
+  <link rel="icon" type="image/png" href="Icon.jpg">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="bg-amber-100 flex h-screen font-sans">
+
+  <!-- Header (Mobile) -->
+  <header
+    class="fixed lg:hidden top-0 left-0 w-full bg-yellow-700 text-white flex items-center justify-between px-4 py-3 shadow-md z-40">
+    <button id="menuBtn" class="p-2 rounded-md focus:outline-none bg-yellow-800">
+      <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <svg id="closeIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <h1 class="font-semibold text-lg">Painel Administrativo</h1>
+  </header>
+
+  <!-- Overlay escurecido -->
+  <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-30 transition-opacity"></div>
+
+<!-- Sidebar -->
+<aside id="sidebar"
+  class="fixed top-0 left-0 h-full w-64 bg-yellow-700 text-white flex flex-col justify-between shadow-xl transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out z-50">
+
+  <div>
+    <!-- Logo -->
+    <div class="flex justify-center items-center h-28 bg-yellow-800">
+      <img 
+        src="logo.jpg" 
+        alt="Logo" 
+        class="h-20 w-auto object-contain transition-transform duration-300 hover:scale-105 rounded-2xl"
+      />
+    </div>
+
+    <!-- Navegação -->
+    <nav class="flex flex-col gap-3 p-5">
+      <a href="dashboard.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Home</a>
+      <a href="gerenciar-avaliacao.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Avaliação</a>
+      <a href="produtos.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Produtos</a>
+      <a href="usuarios.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Usuários</a>
+      <a href="promocao.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Promoção</a>
+      <a href="sobrenos.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Sobre Nós</a>
+      <a href="faq.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">FAQ</a>
+      <a href="gerenciar-banners.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Banner</a>
+      <a href="categorias.html"
+        class="bg-yellow-800 hover:bg-yellow-900 py-2 px-3 rounded-xl text-center font-medium transition-all">Categoria</a>
+    </nav>
+  </div>
+
+  <button id="logoutBtn"
+    class="m-4 bg-red-600 hover:bg-red-700 py-2 rounded-xl text-center font-semibold transition-all">
+    Logout
+  </button>
+</aside>
+
+  <!-- Main -->
+  <main class="flex-1 p-8 overflow-y-auto mt-16 lg:mt-0">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <label class="mr-2 font-medium text-yellow-800">Filtro:</label>
+        <select id="filtro" class="border rounded-md p-1">
+          <option value="todos">Todos</option>
+          <option value="com">Com promoção</option>
+          <option value="sem">Sem promoção</option>
+        </select>
+      </div>
+      <div id="mensagemGlobal" class="text-sm font-medium text-green-700"></div>
+    </div>
+
+    <div id="containerProdutos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+  </main>
+  
+
+  <!-- === CONFIG SUPABASE === -->
+  <script>
+    const SUPABASE_URL = "https://ulxbfffiidjlartupase.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  </script>
+
+  <!-- === VERIFICAR LOGIN ADMIN === -->
+  <script>
+    async function verificarLoginDashboard() {
+      const isLoggedIn = localStorage.getItem("isLoggedIn");
+      const emailUsuario = localStorage.getItem("emailUsuario");
+
+      if (!isLoggedIn || isLoggedIn !== "true") {
+        window.location.href = "../cadastro/login.html";
+        return;
+      }
+
+      if (emailUsuario) {
+        const { data: usuarioData, error } = await supabase
+          .from("usuario")
+          .select("tipo, nome, senha")
+          .eq("email", emailUsuario)
+          .single();
+
+        if (error || !usuarioData || usuarioData.tipo !== "Administrador") {
+          alert("Acesso negado. Apenas administradores podem acessar.");
+          window.location.href = "../cadastro/login.html";
+          return;
+        }
+
+        window.adminData = usuarioData;
+      }
+    }
+  </script>
+
+
+  <!-- Script do menu lateral -->
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+    const overlay = document.getElementById('overlay');
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = sidebar.classList.contains('translate-x-0');
+      if (isOpen) {
+        sidebar.classList.replace('translate-x-0', '-translate-x-full');
+        overlay.classList.add('hidden');
+        menuIcon.classList.remove('hidden');
+        closeIcon.classList.add('hidden');
+      } else {
+        sidebar.classList.replace('-translate-x-full', 'translate-x-0');
+        overlay.classList.remove('hidden');
+        menuIcon.classList.add('hidden');
+        closeIcon.classList.remove('hidden');
+      }
+    });
+
+    overlay.addEventListener('click', () => {
+      sidebar.classList.replace('translate-x-0', '-translate-x-full');
+      overlay.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+  </script>
+
+<!-- === SCRIPT PRINCIPAL === -->
+<script>
+const container = document.getElementById("containerProdutos");
+const filtroEl = document.getElementById("filtro");
+const mensagemGlobal = document.getElementById("mensagemGlobal");
+
+// === CARREGAR PRODUTOS ===
+async function carregarProdutos() {
+  container.innerHTML = `<p class="col-span-full text-center text-yellow-800 font-semibold">Carregando...</p>`;
+  mensagemGlobal.textContent = "";
+
+  try {
+    const [{ data: itens, error: erroItens }, { data: promocoes, error: erroProm }] = await Promise.all([
+      supabase.from("item").select("id_item, nome, preco, imagem, descricao"),
+      supabase.from("promocao").select("id_promocao, item_id, desconto")
+    ]);
+
+    if (erroItens) throw erroItens;
+    if (erroProm) throw erroProm;
+
+    renderizarCards(itens || [], promocoes || []);
+  } catch (err) {
+    console.error("Erro ao carregar dados:", err);
+    container.innerHTML = `<p class="col-span-full text-center text-red-600">Erro ao carregar produtos.</p>`;
+  }
+}
+
+// === RENDERIZAR CARDS ===
+function renderizarCards(itens, promocoes) {
+  const filtro = filtroEl.value;
+  container.innerHTML = "";
+
+  const itensFiltrados = itens.filter(item => {
+    const temPromo = promocoes.some(p => p.item_id === item.id_item);
+    if (filtro === "com") return temPromo;
+    if (filtro === "sem") return !temPromo;
+    return true;
+  });
+
+  if (itensFiltrados.length === 0) {
+    container.innerHTML = `<p class="col-span-full text-center text-gray-500">Nenhum produto encontrado.</p>`;
+    return;
+  }
+
+  itensFiltrados.forEach(item => {
+    const promo = promocoes.find(p => p.item_id === item.id_item);
+    const descontoPct = promo ? Math.round(promo.desconto * 100) : 0;
+    const precoBase = Number(item.preco) || 0;
+    const precoFinal = (precoBase * (1 - (promo?.desconto ?? 0))).toFixed(2);
+
+    const card = document.createElement("div");
+    card.className = "bg-white rounded-xl shadow p-3 flex flex-col";
+
+    card.innerHTML = `
+      <div class="flex items-start gap-3">
+        <div class="w-32 h-32 flex-shrink-0 flex items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+          <img src="${item.imagem || 'https://via.placeholder.com/120x120?text=Sem+Imagem'}"
+               alt="${escapeHtml(item.nome)}"
+               class="object-cover w-full h-full">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-start">
+            <h3 class="text-sm font-semibold text-yellow-800 truncate">${escapeHtml(item.nome)}</h3>
+            <span class="text-xs text-gray-500">ID ${item.id_item}</span>
+          </div>
+          <p class="text-xs text-gray-600 mt-1 line-clamp-2">${escapeHtml(item.descricao || '')}</p>
+
+          <div class="mt-2 flex items-center gap-2">
+            <div class="text-xs text-gray-700">Original</div>
+            <div class="text-sm font-medium line-through text-red-500">R$ ${precoBase.toFixed(2)}</div>
+          </div>
+
+          <div class="mt-1">
+            <div class="text-xs text-gray-700">Final</div>
+            <div class="text-sm font-bold text-green-700">R$ <span id="final_${item.id_item}">${precoFinal}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs text-yellow-800 font-medium mb-1">Preço (R$)</label>
+          <input type="number" id="preco_${item.id_item}" value="${precoBase.toFixed(2)}" step="0.01" min="0"
+                 class="w-full border rounded px-2 py-1 text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs text-yellow-800 font-medium mb-1">Desconto (%)</label>
+          <input type="number" id="desconto_${item.id_item}" value="${descontoPct}" min="0" max="100" step="1"
+                 class="w-full border rounded px-2 py-1 text-sm" />
+        </div>
+
+        <div class="col-span-2 flex gap-2 mt-2">
+          <button class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-1 rounded text-sm font-semibold btn-salvar">
+            💾 Salvar
+          </button>
+          ${promo ? `<button class="bg-red-600 hover:bg-red-700 text-white py-1 px-3 rounded text-sm btn-remover">
+            🗑️ Remover
+          </button>` : ""}
+        </div>
+      </div>
+    `;
+
+    const precoInput = card.querySelector(`#preco_${item.id_item}`);
+    const descontoInput = card.querySelector(`#desconto_${item.id_item}`);
+    const finalSpan = card.querySelector(`#final_${item.id_item}`);
+    const btnSalvar = card.querySelector(".btn-salvar");
+    const btnRemover = card.querySelector(".btn-remover");
+
+    function atualizarFinal() {
+      const p = Number(precoInput.value) || 0;
+      const d = (Number(descontoInput.value) || 0) / 100;
+      finalSpan.textContent = (p * (1 - d)).toFixed(2);
+    }
+
+    precoInput.addEventListener("input", atualizarFinal);
+    descontoInput.addEventListener("input", atualizarFinal);
+
+    btnSalvar.addEventListener("click", () => salvarAlteracoes(item.id_item, precoInput.value, descontoInput.value));
+
+    if (btnRemover) {
+      btnRemover.addEventListener("click", () => removerPromocao(promo.id_promocao));
+    }
+
+    container.appendChild(card);
+  });
+}
+
+// === FUNÇÕES AUXILIARES ===
+async function salvarAlteracoes(idItem, preco, desconto) {
+  try {
+    const descontoDecimal = Number(desconto) / 100;
+    
+    // Verifica se já existe promoção
+    const { data: promoExistente } = await supabase
+      .from("promocao")
+      .select("*")
+      .eq("item_id", idItem)
+      .single();
+
+    if (promoExistente) {
+      // Atualiza promoção
+      await supabase.from("promocao")
+        .update({ desconto: descontoDecimal })
+        .eq("id_promocao", promoExistente.id_promocao);
+    } else if (descontoDecimal > 0) {
+      // Cria nova promoção se desconto > 0
+      await supabase.from("promocao")
+        .insert([{ item_id: idItem, desconto: descontoDecimal }]);
+    }
+
+    // Atualiza preço do item
+    await supabase.from("item")
+      .update({ preco: Number(preco) })
+      .eq("id_item", idItem);
+
+    mensagemGlobal.textContent = `Produto ${idItem} atualizado com sucesso!`;
+    carregarProdutos();
+  } catch (err) {
+    console.error("Erro ao salvar alterações:", err);
+    mensagemGlobal.textContent = `Erro ao atualizar o produto ${idItem}.`;
+  }
+}
+
+async function removerPromocao(idPromocao) {
+  try {
+    await supabase.from("promocao").delete().eq("id_promocao", idPromocao);
+    mensagemGlobal.textContent = "Promoção removida com sucesso!";
+    carregarProdutos();
+  } catch (err) {
+    console.error("Erro ao remover promoção:", err);
+    mensagemGlobal.textContent = "Erro ao remover promoção.";
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+// === INICIALIZAÇÃO ===
+verificarLoginDashboard().then(() => carregarProdutos());
+filtroEl.addEventListener("change", carregarProdutos);
+</script>
+
+
+  <script>
+  // Função de logout
+  function logout() {
+    // Remove os dados do usuário do localStorage
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("emailUsuario");
+    localStorage.removeItem("nomeUsuario"); // se você estiver armazenando também
+
+    // Mensagem de confirmação
+    alert("Você saiu com sucesso!");
+
+    // Redireciona para a página de login
+    window.location.href = "../cadastro/login.html";
+  }
+
+  // Adiciona o evento ao botão de logout
+  const btnLogout = document.getElementById("logoutBtn");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", logout);
+  }
+</script>
+
+</body>
+</html>

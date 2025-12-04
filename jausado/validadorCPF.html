@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador de CPF</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+function validarCPF(cpf) {                            //(cpf) é um id só colocar o id no local e ele já vai funcionar
+  cpf = cpf.replace(/\D/g, ''); // remove não-dígitos
+
+  if (cpf.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+  let soma = 0, resto;
+
+  // 1º dígito
+  for (let i = 0; i < 9; i++) soma += parseInt(cpf[i]) * (10 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  if (resto !== parseInt(cpf[9])) return false;
+
+  // 2º dígito
+  soma = 0;
+  for (let i = 0; i < 10; i++) soma += parseInt(cpf[i]) * (11 - i);
+  resto = (soma * 10) % 11;
+  if (resto === 10) resto = 0;
+  if (resto !== parseInt(cpf[10])) return false;
+
+  return true;
+}
+
+function testarCPF() {
+  const input = document.getElementById('cpf').value;
+  const valido = validarCPF(input);
+  const resultado = document.getElementById('resultado');
+  resultado.textContent = valido ? '✅ CPF Válido' : '❌ CPF Inválido';
+  resultado.className = valido ? 'text-green-600 text-lg font-semibold mt-4' 
+                               : 'text-red-600 text-lg font-semibold mt-4';
+}
+
+// Aplica a máscara enquanto digita
+function aplicarMascara(e) {
+  let v = e.target.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d)/, '$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  e.target.value = v;
+}
+</script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md text-center">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Validador de CPF</h2>
+    <input id="cpf"
+           type="text"
+           placeholder="###.###.###-##"
+           oninput="aplicarMascara(event)"
+           class="border border-gray-300 rounded-lg px-4 py-2 w-64 text-center text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+    <button onclick="testarCPF()"
+            class="ml-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg">
+      Validar
+    </button>
+    <p id="resultado" class="mt-4 text-lg"></p>
+  </div>
+</body>
+</html>

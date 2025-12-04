@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliações - Marcelino's</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="Marcelinostestes/inicio/3d/comeco/style.css">
+
+  <style>
+    :root {
+      --marrom: #cd7400;
+      --marrom-escuro: #ad5400;
+      --dourado: #ffc300;
+      --creme: #fff7e6;
+      --card-bg: #ffffff;
+      --text: #4b2e05;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--creme);
+    }
+    .estrela {
+      color: var(--dourado);
+      font-size: 1.3rem;
+    }
+    .estrela-interativa {
+      cursor: pointer;
+      transition: transform 0.15s ease, color 0.2s;
+    }
+    .estrela-interativa:hover {
+      transform: scale(1.2);
+      color: #ffdb4d;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+<!-- ===== HEADER MARCELINO'S ===== -->
+<header class="site-header w-full shadow-md fixed top-0 left-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    
+    <!-- Logo -->
+    <h1 class="text-3xl font-bold font-[Lobster] ">
+      Marcelino's
+    </h1>
+
+    <!-- Botão do menu mobile -->
+    <button id="menu-toggle" class="md:hidden text-yellow-400 focus:outline-none text-3xl">
+      ☰
+    </button>
+
+    <!-- Navegação -->
+   <nav id="menu" class="hidden md:flex flex-wrap items-center gap-3 text-lg font-semibold">
+  <a href="Marcelinostestes\inicio\3d\comeco\teste_pagina.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Home</a>
+  <a href="#produtos" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Produtos</a>
+  <a href="#promoCarousel" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Promoções</a>
+  <a href="#abtus" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Sobre</a>
+  <a href="#faqQ" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">FAQ</a>
+  <a href="../../../../avaliacao.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Avaliação</a>
+<a href="../../../../cadastro/login.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Login</a>
+
+<button id="logoutBtn"
+class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition text-white">
+Logout
+</button>
+
+</nav>
+
+  </div>
+
+  <!-- Menu colapsável (mobile) -->
+  <div id="mobile-menu" class="hidden flex-col items-center bg-[#7B4B24] md:hidden pb-4">
+ <a href="Marcelinostestes\inicio\3d\comeco\teste_pagina.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Home</a>
+  <a href="#produtos" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Produtos</a>
+  <a href="#promoCarousel" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Promoções</a>
+  <a href="#abtus" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Sobre</a>
+  <a href="#faqQ" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">FAQ</a>
+  <a href="../../../../avaliacao.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Avaliação</a>
+<a href="../../../../cadastro/login.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Login</a>
+
+<button id="logoutBtn"
+class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition text-white">
+Logout
+</button>
+  </div>
+</header>
+<script>
+// =============== MENU HAMBÚRGUER ===============
+document.addEventListener("DOMContentLoaded", () => {
+  const menu = document.getElementById("menu");               // menu desktop
+  const mobileMenu = document.getElementById("mobile-menu");  // menu mobile
+  const menuToggle = document.getElementById("menu-toggle");  // botão hambúrguer
+
+  if (!menuToggle || !mobileMenu) {
+    console.error("Erro: IDs 'menu-toggle' ou 'mobile-menu' não encontrados.");
+    return;
+  }
+
+  // Abre / Fecha o menu mobile
+  menuToggle.addEventListener("click", (event) => {
+    event.stopPropagation(); // evita fechar ao clicar no próprio botão
+    mobileMenu.classList.toggle("hidden");
+  });
+
+  // Fecha ao clicar nos links
+  mobileMenu.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      mobileMenu.classList.add("hidden");
+    });
+  });
+
+  // Fecha ao clicar fora
+  document.addEventListener("click", (event) => {
+    const clickedOutsideButton = !menuToggle.contains(event.target);
+    const clickedOutsideMenu = !mobileMenu.contains(event.target);
+
+    if (clickedOutsideButton && clickedOutsideMenu) {
+      mobileMenu.classList.add("hidden");
+    }
+  });
+});
+</script>
+
+
+  <!-- Adicione um espaçamento para compensar o header fixo -->
+<div class="h-[80px]"></div>
+
+  <!-- MENU SCRIPT -->
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const navMenu = document.getElementById('navMenu');
+    menuBtn.addEventListener('click', () => {
+      navMenu.classList.toggle('hidden');
+      navMenu.classList.toggle('flex');
+    });
+  </script>
+
+  <!-- CONTEÚDO -->
+  <main class="max-w-4xl mx-auto w-full px-4 py-10">
+    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+      <h2 class="text-3xl font-bold text-[#7B4B24]">Avaliações dos Clientes</h2>
+      <button id="btnEncontrarMinha" class="bg-[#ffc300] text-[#4f3017] font-medium px-4 py-2 rounded-lg shadow hover:bg-[#e1a642] transition">
+        Minha Avaliação
+      </button>
+    </div>
+
+    <!-- Média Geral -->
+    <section id="media-geral" class="hidden bg-white rounded-2xl shadow-md border border-[#ffc300]/70 p-6 mb-10">
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h3 class="text-xl font-semibold mb-1 text-[#7B4B24]">Média Geral</h3>
+          <div id="media-estrelas" class="flex gap-1 mb-1"></div>
+          <p id="media-valor" class="text-sm text-gray-600"></p>
+        </div>
+        <div class="text-right">
+          <p id="media-status" class="text-lg font-semibold text-[#985600]"></p>
+          <p id="media-extra" class="text-sm italic text-gray-500"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Avaliação do usuário -->
+    <div id="my-review" class="mb-8 hidden"></div>
+
+        <!-- Formulário -->
+    <section id="form-section" class="bg-white rounded-xl shadow-md p-6 border border-[#e8d3b2]">
+      <h3 class="text-xl font-semibold text-[#7B4B24] mb-3">Deixe sua avaliação</h3>
+      <div id="not-logged" class="mb-3 text-sm text-red-600 hidden">
+        Você precisa estar logado para enviar uma avaliação.
+      </div>
+
+      <form id="avaliacaoForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1 text-[#7B4B24]">Sua nota</label>
+          <div id="star-wrapper" class="flex gap-2"></div>
+        </div>
+
+        <div>
+          <label for="comentario" class="block text-sm font-medium mb-1 text-[#7B4B24]">Comentário</label>
+          <textarea id="comentario" rows="3" class="w-full rounded-md p-3 border border-gray-300 focus:ring-[#985600] focus:border-[#985600]" placeholder="Conte sobre sua experiência..."></textarea>
+        </div>
+
+        <div class="flex gap-3 items-center">
+          <button id="btnEnviar" type="submit" class="bg-[#985600] text-[#fff7e6] px-5 py-2.5 rounded-lg shadow hover:brightness-95 transition font-medium">
+            Enviar Avaliação
+          </button>
+          <div id="form-msg" class="text-sm text-[#7B4B24]"></div>
+        </div>
+      </form>
+    </section> <br>
+
+    <!-- Filtros -->
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-semibold text-[#7B4B24]">Ordenar por:</h3>
+      <select id="filtroOrdenacao" class="border bg-[#ffeecc] text-gray-800 border-gray-300 rounded-md p-2 bg-white focus:ring-[#985600] focus:border-[#985600]">
+        <option value="recentes">Mais recentes</option>
+        <option value="melhores">Melhores avaliações</option>
+        <option value="piores">Piores avaliações</option>
+      </select>
+    </div>
+
+    <!-- Lista de Avaliações -->
+    <section id="avaliacoes-list" class="flex flex-col gap-4 mb-8">
+      <div id="loading" class="text-sm italic text-[#7B4B24]">Carregando avaliações...</div>
+    </section>
+  </main>
+
+<script>
+  // Função de logout
+  function logout() {
+    // Remove os dados do usuário do localStorage
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("emailUsuario");
+    localStorage.removeItem("nomeUsuario"); // se você estiver armazenando também
+
+    // Mensagem de confirmação
+    alert("Você saiu com sucesso!");
+
+    // Redireciona para a página de login
+    window.location.href = "Marcelinostestes/inicio/3d/comeco/teste_pagina.html";
+  }
+
+  // Adiciona o evento ao botão de logout
+  const btnLogout = document.getElementById("logoutBtn");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", logout);
+  }
+</script>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://ulxbfffiidjlartupase.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const avaliacoesList = document.getElementById('avaliacoes-list');
+const loading = document.getElementById('loading');
+const myReviewDiv = document.getElementById('my-review');
+const avaliacaoForm = document.getElementById('avaliacaoForm');
+const starWrapper = document.getElementById('star-wrapper');
+const comentarioInput = document.getElementById('comentario');
+const btnEnviar = document.getElementById('btnEnviar');
+const notLogged = document.getElementById('not-logged');
+const formMsg = document.getElementById('form-msg');
+const filtroOrdenacao = document.getElementById('filtroOrdenacao');
+const formSection = document.getElementById('form-section');
+const mediaGeral = document.getElementById('media-geral');
+const mediaEstrelas = document.getElementById('media-estrelas');
+const mediaValor = document.getElementById('media-valor');
+const mediaStatus = document.getElementById('media-status');
+const mediaExtra = document.getElementById('media-extra');
+const btnEncontrarMinha = document.getElementById('btnEncontrarMinha');
+
+let notaSelecionada = 5;
+let usuarioId = localStorage.getItem('usuario_id');
+
+// --- Renderização de estrelas ---
+function renderStars(value, interactive=false, container=starWrapper){
+  container.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const s=document.createElement('span');
+    s.className='estrela '+(interactive?'estrela-interativa':'');
+    s.innerHTML=i<=value?'★':'☆';
+    if(interactive) s.addEventListener('click', ()=>{ notaSelecionada=i; renderStars(notaSelecionada,true,container); });
+    container.appendChild(s);
+  }
+}
+
+// --- Cria um card de avaliação ---
+function criarCard(av){
+  const card=document.createElement('article');
+  card.className='bg-[var(--card-bg)] rounded-lg p-4 shadow-md border-l-4 border-[var(--marrom)] relative';
+  card.dataset.usuarioId = av.usuario_id;
+
+  const top=document.createElement('div'); top.className='flex items-center gap-3';
+  const avatar=document.createElement('div');
+  avatar.className='w-10 h-10 rounded-full bg-[var(--marrom)] flex items-center justify-center text-wheat font-bold';
+  avatar.textContent=av.usuario?.nome?.charAt(0)?.toUpperCase() || '?';
+  const info=document.createElement('div');
+  const nomeEl=document.createElement('h4');
+  nomeEl.className='text-lg font-semibold text-[var(--marrom-escuro)]';
+  nomeEl.textContent=av.usuario?.nome || 'Usuário';
+  const dataEl=document.createElement('p');
+  dataEl.className='text-xs text-[var(--marrom-escuro)]';
+  dataEl.textContent=new Date(av.data).toLocaleString();
+  info.appendChild(nomeEl);
+  info.appendChild(createStarElement(av.nota || 0));
+  info.appendChild(dataEl);
+  top.appendChild(avatar);
+  top.appendChild(info);
+  card.appendChild(top);
+
+  const comentario=document.createElement('p');
+  comentario.className='mt-3 italic text-[var(--text)]';
+  comentario.textContent=av.comentario ? `"${av.comentario}"` : '';
+  card.appendChild(comentario);
+
+  return card;
+}
+
+function createStarElement(value){
+  const wrapper=document.createElement('div'); wrapper.className='flex gap-1';
+  for(let i=1;i<=5;i++){
+    const s=document.createElement('span');
+    s.textContent=i<=value?'★':'☆';
+    s.className='estrela';
+    wrapper.appendChild(s);
+  }
+  return wrapper;
+}
+
+// --- Média geral ---
+function mostrarMedia(avaliacoes){
+  if(!avaliacoes.length){ mediaGeral.classList.add('hidden'); return; }
+  const media = avaliacoes.reduce((acc,a)=>acc+a.nota,0)/avaliacoes.length;
+  mediaGeral.classList.remove('hidden');
+  mediaValor.textContent = `${media.toFixed(1)} de 5 (${avaliacoes.length} avaliações)`;
+  renderStars(Math.round(media), false, mediaEstrelas);
+
+  // Mensagem interpretativa
+  if(media>=4.5){ mediaStatus.textContent='Excelente 👏'; mediaExtra.textContent='A maioria dos clientes adorou!'; }
+  else if(media>=3.5){ mediaStatus.textContent='Muito bom 👍'; mediaExtra.textContent='A maioria das notas é positiva.'; }
+  else if(media>=2.5){ mediaStatus.textContent='Regular 😐'; mediaExtra.textContent='Experiências variadas.'; }
+  else { mediaStatus.textContent='Precisa melhorar 😕'; mediaExtra.textContent='Muitas avaliações baixas.'; }
+}
+
+// --- Carregar avaliações ---
+async function carregarAvaliacoes(ordenarPor='recentes'){
+  loading.style.display='block';
+  avaliacoesList.innerHTML='';
+
+  try{
+    let query = supabase.from('avaliacaocliente')
+      .select('id_avaliacao, nota, comentario, usuario_id, data, usuario:usuario_id(nome)')
+      .order('data',{ascending:false});
+
+    const { data } = await query;
+    if(!data || data.length===0){
+      avaliacoesList.innerHTML='<div class="text-sm italic">Ainda não há avaliações.</div>';
+      mediaGeral.classList.add('hidden');
+      return;
+    }
+
+    // Ordenação personalizada
+    if(ordenarPor==='melhores') data.sort((a,b)=>b.nota - a.nota);
+    if(ordenarPor==='piores') data.sort((a,b)=>a.nota - b.nota);
+
+    mostrarMedia(data);
+    data.forEach(av=>avaliacoesList.appendChild(criarCard(av)));
+
+  }catch(err){
+    console.error(err);
+    avaliacoesList.innerHTML='<div class="text-sm text-red-600">Erro ao carregar avaliações.</div>';
+  }finally{
+    loading.style.display='none';
+  }
+}
+
+// --- Encontra e destaca a avaliação do usuário ---
+function encontrarMinhaAvaliacao(){
+  if(!usuarioId){ alert('Você precisa estar logado.'); return; }
+  const cards = avaliacoesList.querySelectorAll('article');
+  let encontrado = false;
+  cards.forEach(c=>{
+    if(c.dataset.usuarioId == usuarioId){
+      encontrado = true;
+      c.scrollIntoView({behavior:'smooth', block:'center'});
+      c.classList.add('ring-4','ring-[var(--dourado)]','scale-[1.02]');
+      setTimeout(()=>c.classList.remove('ring-4','ring-[var(--dourado)]','scale-[1.02]'),3000);
+    }
+  });
+  if(!encontrado) alert('Você ainda não enviou uma avaliação.');
+}
+
+// --- Carregar avaliação própria ---
+async function carregarMinhaAvaliacao() {
+  if (!usuarioId) return;
+  try {
+    const { data } = await supabase.from('avaliacaocliente')
+      .select('id_avaliacao, nota, comentario, data, usuario:usuario_id(nome)')
+      .eq('usuario_id', usuarioId).maybeSingle();
+
+    if (data && data.id_avaliacao) {
+      formSection.classList.add('hidden');
+      myReviewDiv.classList.remove('hidden');
+      myReviewDiv.innerHTML = `
+        <div class="bg-[var(--card-bg)] rounded-lg p-4 shadow-md border-l-4 border-[var(--marrom)] relative">
+          <h4 class="text-lg font-semibold text-[var(--marrom-escuro)] mb-1">${data.usuario.nome}</h4>
+          <div id="minha-estrelas" class="flex gap-1 mb-2"></div>
+          <p class="text-xs text-[var(--marrom-escuro)] mb-2">Data: ${new Date(data.data).toLocaleString()}</p>
+          <p id="comentario-view" class="italic text-[var(--text)] mb-3">"${data.comentario}"</p>
+          <textarea id="editar-comentario" class="w-full h-24 rounded overflow-hidden resize-none p-2 border mb-3 hidden">${data.comentario}</textarea>
+          <div class="flex gap-2">
+            <button id="btnExcluir" class="bg-red-600 text-white px-4 py-2 rounded">Excluir</button>
+            <button id="btnEditar" class="bg-[var(--marrom)] text-white px-4 py-2 rounded">Editar</button>
+            <button id="btnCancelar" class="hidden bg-red-600 text-white px-4 py-2 rounded">Cancelar</button>
+            <button id="btnSalvar" class="hidden bg-[var(--marrom)] text-white px-4 py-2 rounded">Salvar</button>
+          </div>
+          <div id="msgAtualizacao" class="text-sm mt-1"></div>
+        </div>`;
+
+      const textarea = document.getElementById('editar-comentario');
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+
+      // renderiza as estrelas fixas
+      const estrelasContainer = document.getElementById('minha-estrelas');
+      let notaAtual = data.nota;
+      renderStars(notaAtual, false, estrelasContainer);
+
+      // Ao clicar em Editar
+      document.getElementById('btnEditar').addEventListener('click', () => {
+        document.getElementById('editar-comentario').classList.remove('hidden');
+        document.getElementById('comentario-view').classList.add('hidden');
+        document.getElementById('btnSalvar').classList.remove('hidden');
+        document.getElementById('btnCancelar').classList.remove('hidden');
+        document.getElementById('btnEditar').classList.add('hidden');
+        document.getElementById('btnExcluir').classList.add('hidden');
+
+        // Torna as estrelas interativas para reavaliar
+        renderStars(notaAtual, true, estrelasContainer);
+        estrelasContainer.querySelectorAll('.estrela-interativa').forEach((star, index) => {
+          star.addEventListener('click', () => {
+            notaAtual = index + 1;
+          });
+        });
+      });
+
+      // Botão Cancelar
+      document.getElementById('btnCancelar').addEventListener('click', () => {
+        document.getElementById('editar-comentario').classList.add('hidden');
+        document.getElementById('comentario-view').classList.remove('hidden');
+        document.getElementById('btnSalvar').classList.add('hidden');
+        document.getElementById('btnCancelar').classList.add('hidden');
+        document.getElementById('btnEditar').classList.remove('hidden');
+          document.getElementById('btnExcluir').classList.remove('hidden');
+        renderStars(data.nota, false, estrelasContainer);
+      });
+
+      // Botão Salvar
+      document.getElementById('btnSalvar').addEventListener('click', async () => {
+        const novoComentario = document.getElementById('editar-comentario').value.trim();
+        await supabase.from('avaliacaocliente')
+          .update({ comentario: novoComentario, nota: notaAtual })
+          .eq('id_avaliacao', data.id_avaliacao);
+
+        document.getElementById('msgAtualizacao').textContent = 'Atualizado com sucesso!';
+        document.getElementById('btnExcluir').classList.remove('hidden');
+        carregarAvaliacoes(filtroOrdenacao.value);
+        carregarMinhaAvaliacao();
+      });
+
+      // Botão Excluir
+      document.getElementById('btnExcluir').addEventListener('click', async () => {
+        if (confirm('Deseja realmente excluir sua avaliação?')) {
+          await supabase.from('avaliacaocliente').delete().eq('id_avaliacao', data.id_avaliacao);
+          myReviewDiv.classList.add('hidden');
+          formSection.classList.remove('hidden');
+          comentarioInput.value = '';
+          notaSelecionada = 5;
+          renderStars(notaSelecionada, true);
+          carregarAvaliacoes(filtroOrdenacao.value);
+        }
+      });
+
+    } else {
+      myReviewDiv.classList.add('hidden');
+      formSection.classList.remove('hidden');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+// --- Enviar nova avaliação ---
+avaliacaoForm.addEventListener('submit', async(e)=>{
+  e.preventDefault(); formMsg.textContent='';
+  if(!usuarioId){ notLogged.style.display=''; return;}
+  notLogged.style.display='none';
+  const comentario=comentarioInput.value.trim();
+  btnEnviar.disabled=true; btnEnviar.textContent='Enviando...';
+  try{
+    const { data: existe } = await supabase.from('avaliacaocliente')
+      .select('id_avaliacao').eq('usuario_id',usuarioId).maybeSingle();
+    if(existe && existe.id_avaliacao){
+      formMsg.textContent='Você já fez uma avaliação.';
+      formSection.classList.add('hidden');
+      await carregarMinhaAvaliacao();
+      return;
+    }
+    await supabase.from('avaliacaocliente').insert([{usuario_id:usuarioId, nota:notaSelecionada, comentario, data:new Date().toISOString()}]);
+    comentarioInput.value='';
+    formMsg.textContent='Avaliação enviada com sucesso!';
+    carregarAvaliacoes(filtroOrdenacao.value);
+    carregarMinhaAvaliacao();
+  }catch(err){
+    console.error(err);
+    formMsg.textContent='Erro ao enviar.';
+  }finally{
+    btnEnviar.disabled=false;
+    btnEnviar.textContent='Enviar Avaliação';
+  }
+});
+
+function makeAutoResize(textarea) {
+  if (!textarea) return;
+  textarea.style.overflow = 'hidden';
+  textarea.style.resize = 'none';
+  
+  const resize = () => {
+    textarea.style.height = '6rem';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  };
+
+  textarea.addEventListener('input', resize);
+  resize(); // ajuste inicial
+}
+
+// Formulário de avaliação
+makeAutoResize(document.getElementById('comentario'));
+
+// Textarea de edição da própria avaliação (quando carregada)
+const editarComentario = document.getElementById('editar-comentario');
+if (editarComentario) makeAutoResize(editarComentario);
+
+// --- Eventos ---
+filtroOrdenacao.addEventListener('change', ()=>carregarAvaliacoes(filtroOrdenacao.value));
+btnEncontrarMinha.addEventListener('click', encontrarMinhaAvaliacao);
+
+// Inicialização
+renderStars(notaSelecionada,true);
+carregarAvaliacoes();
+carregarMinhaAvaliacao();
+
+</script>
+
+
+<script>
+// ====== TROCA DE LOGIN / LOGOUT ======
+
+const loginBtn = document.querySelector('a[href="../../../../cadastro/login.html"]');
+const logoutBtn = document.getElementById("logoutBtn");
+
+// Se estiver logado
+function atualizarHeader() {
+  const isLoggedIn = localStorage.getItem("usuario_id");
+
+  if (isLoggedIn) {
+    // Usuário logado → mostra Logout, esconde Login
+    if (loginBtn) loginBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "block";
+  } else {
+    // Usuário NÃO logado → mostra Login, esconde Logout
+    if (loginBtn) loginBtn.style.display = "block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+  }
+}
+
+atualizarHeader();
+
+// ====== FUNÇÃO DE LOGOUT =======
+function logout() {
+  localStorage.removeItem("usuario_id");
+  localStorage.removeItem("emailUsuario");
+  localStorage.removeItem("nomeUsuario");
+  localStorage.removeItem("isLoggedIn");
+
+  alert("Você saiu com sucesso!");
+
+  window.location.reload(); // Força atualizar o header
+}
+
+logoutBtn.addEventListener("click", logout);
+</script>
+
+
+</body>
+</html>
