@@ -18,6 +18,7 @@
     <!-- Conteúdo da Loja -->
     <div id="conteudo" class="hidden overflow-x-hidden">
 <!-- ===== HEADER MARCELINO'S ===== -->
+<!-- ===== HEADER MARCELINO'S ===== -->
 <header class="site-header w-full shadow-md fixed top-0 left-0 z-50">
   <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
     
@@ -33,7 +34,7 @@
 
     <!-- Navegação -->
    <nav id="menu" class="hidden md:flex flex-wrap items-center gap-3 text-lg font-semibold">
-  <a href="teste_pagina.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Home</a>
+  <a href="Marcelinostestes/teste_pagina.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Home</a>
   <a href="#produtos" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Produtos</a>
   <a href="#promoCarousel" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Promoções</a>
   <a href="#abtus" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Sobre</a>
@@ -52,7 +53,7 @@ Logout
 
   <!-- Menu colapsável (mobile) -->
   <div id="mobile-menu" class="hidden flex-col items-center bg-[#7B4B24] md:hidden pb-4">
- <a href="teste_pagina.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Home</a>
+ <a href="Marcelinostestes/teste_pagina.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Home</a>
   <a href="#produtos" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Produtos</a>
   <a href="#promoCarousel" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Promoções</a>
   <a href="#abtus" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Sobre</a>
@@ -101,6 +102,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+</script>
+
+<script>
+// ====== TROCA DE LOGIN / LOGOUT ======
+
+const loginBtn = document.querySelector('a[href="../cadastro/login.html"]');
+const logoutBtn = document.getElementById("logoutBtn");
+
+// Se estiver logado
+function atualizarHeader() {
+  const isLoggedIn = localStorage.getItem("usuario_id");
+
+  if (isLoggedIn) {
+    // Usuário logado → mostra Logout, esconde Login
+    if (loginBtn) loginBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "block";
+  } else {
+    // Usuário NÃO logado → mostra Login, esconde Logout
+    if (loginBtn) loginBtn.style.display = "block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+  }
+}
+
+atualizarHeader();
+
+// ====== FUNÇÃO DE LOGOUT =======
+function logout() {
+  localStorage.removeItem("usuario_id");
+  localStorage.removeItem("emailUsuario");
+  localStorage.removeItem("nomeUsuario");
+  localStorage.removeItem("isLoggedIn");
+
+  alert("Você saiu com sucesso!");
+
+  window.location.reload(); // Força atualizar o header
+}
+
+logoutBtn.addEventListener("click", logout);
 </script>
 
 
@@ -257,11 +296,11 @@ document.getElementById('prev3D').addEventListener('click', () => {
     </select>
   </div>
 
-  <button id="finishOrder" class="finish-order">Finalizar Pedido</button>
+  <button id="finishOrder" class="finish-order" id="finish-order">Finalizar Pedido</button>
 </div>
 
 <!-- Botão para abrir o carrinho -->
-<button id="openCart" class="open-cart-btn">🛒 Carrinho</button>
+<button id="openCart" class="open-cart-btn" id="open-cart-btn">🛒 Carrinho</button>
 
       <section class="banner-carousel-container" aria-label="Carrossel de banners" style="width:100%; max-width:1100px; margin: 30px auto;">
         <button class="arrow left" id="bannerPrev" aria-label="Banner anterior" style="background:var(--accent); display: none;">&#10094;</button>
@@ -421,6 +460,7 @@ document.getElementById('prev3D').addEventListener('click', () => {
       return;
     }
 
+
     // 🧱 Monta o HTML dinamicamente
     container.innerHTML = "";
     data.forEach(item => {
@@ -444,6 +484,8 @@ document.getElementById('prev3D').addEventListener('click', () => {
     container.innerHTML = "<p>Erro ao carregar perguntas.</p>";
   }
 }
+
+
 
 
       
@@ -471,6 +513,42 @@ const bannerCarousel = document.getElementById('bannerCarousel') || document.que
 function detectarPlataforma() {
   return window.innerWidth <= 768 ? 'Mobile' : 'Desktop';
 }
+
+
+
+
+
+
+
+async function verificarLogin() {
+  const { data: { session } } = await supabase.auth.getSession();
+  // session.user.id contém o id do usuário logado
+  return session ? session.user.id : null;
+}
+
+// ===== Bloquear acesso ao carrinho =====
+document.getElementById("open-cart-btn").addEventListener("click", async (e) => {
+  const usuarioId = await verificarLogin();
+  if (!usuarioId) {
+    alert("Você precisa estar logado para acessar o carrinho!");
+    window.location.href = "../cadastro/login.html";
+    e.preventDefault();
+  }
+});
+
+// ===== Bloquear acesso ao finalizar pedido =====
+document.getElementById("finish-order").addEventListener("click", async (e) => {
+  const usuarioId = await verificarLogin();
+  if (!usuarioId) {
+    alert("Você precisa estar logado para finalizar a compra!");
+    window.location.href = "../cadastro/login.html";
+    e.preventDefault();
+  }
+});
+
+
+
+
 
 // Função principal sem duplicar
 async function carregarBanners() {
@@ -757,42 +835,6 @@ renderCart();
     </script>
 
 
-<script>
-// ====== TROCA DE LOGIN / LOGOUT ======
 
-const loginBtn = document.querySelector('a[href="../../../../cadastro/login.html"]');
-const logoutBtn = document.getElementById("logoutBtn");
-
-// Se estiver logado
-function atualizarHeader() {
-  const isLoggedIn = localStorage.getItem("usuario_id");
-
-  if (isLoggedIn) {
-    // Usuário logado → mostra Logout, esconde Login
-    if (loginBtn) loginBtn.style.display = "none";
-    if (logoutBtn) logoutBtn.style.display = "block";
-  } else {
-    // Usuário NÃO logado → mostra Login, esconde Logout
-    if (loginBtn) loginBtn.style.display = "block";
-    if (logoutBtn) logoutBtn.style.display = "none";
-  }
-}
-
-atualizarHeader();
-
-// ====== FUNÇÃO DE LOGOUT =======
-function logout() {
-  localStorage.removeItem("usuario_id");
-  localStorage.removeItem("emailUsuario");
-  localStorage.removeItem("nomeUsuario");
-  localStorage.removeItem("isLoggedIn");
-
-  alert("Você saiu com sucesso!");
-
-  window.location.reload(); // Força atualizar o header
-}
-
-logoutBtn.addEventListener("click", logout);
-</script>
   </body>
   </html>

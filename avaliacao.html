@@ -7,9 +7,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="Marcelinostestes/style.css">
+  
 
   <style>
+    a{
+      color: white !important;
+    }
+    a:hover{
+      color: var(--text) !important;
+    }
     :root {
       --marrom: #cd7400;
       --marrom-escuro: #ad5400;
@@ -34,6 +40,10 @@
       transform: scale(1.2);
       color: #ffdb4d;
     }
+
+    .titulo{
+      color: rgb(171, 0, 0);
+    }
   </style>
 </head>
 
@@ -44,7 +54,7 @@
   <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
     
     <!-- Logo -->
-    <h1 class="text-3xl font-bold font-[Lobster] ">
+    <h1 class="text-3xl font-bold font-[Lobster] titulo ">
       Marcelino's
     </h1>
 
@@ -221,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alert("Você saiu com sucesso!");
 
     // Redireciona para a página de login
-    window.location.href = "Marcelinostestes/inicio/3d/comeco/teste_pagina.html";
+    window.location.href = "Marcelinostestes/teste_pagina.html";
   }
 
   // Adiciona o evento ao botão de logout
@@ -546,7 +556,7 @@ carregarMinhaAvaliacao();
 <script>
 // ====== TROCA DE LOGIN / LOGOUT ======
 
-const loginBtn = document.querySelector('a[href="../../../../cadastro/login.html"]');
+const loginBtn = document.querySelector('a[href="../cadastro/login.html"]');
 const logoutBtn = document.getElementById("logoutBtn");
 
 // Se estiver logado
