@@ -200,6 +200,7 @@ header {
   padding: 10px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.25);
   transition: transform 0.18s ease;
+  overflow-x: hidden;
 }
 
 
@@ -259,7 +260,15 @@ header {
   gap: 22px;
 }
 
+
 .card-produto {
+  
+  /* ... (Seus estilos existentes) ... */
+  display: flex; /* Habilita o Flexbox */
+  flex-direction: column; /* Coloca os itens verticalmente */
+  height: 100%; /* Garante que o card ocupe o espaço disponível */
+  justify-content: flex-start; /* Alinha o conteúdo ao topo (padrão) */
+
   background: #fff;
   border-radius: 14px;
   padding: 15px;
@@ -534,7 +543,7 @@ async function carregarProdutosPromocao() {
       card.innerHTML = `
         <img src="${produto.imagem}" alt="${produto.nome}">
         <h3>${produto.nome}</h3>
-        <p style="color:#fff;">${produto.descricao || ""}</p>
+      
         <p>
           <span style="text-decoration: line-through; opacity:0.8">R$ ${precoOriginal.toFixed(2)}</span><br>
           <strong style="color:var(--accent-hover); font-size:1.2em;">R$ ${precoPromocional}</strong>
@@ -606,9 +615,11 @@ async function carregarTodosOsProdutos() {
       container.innerHTML += `
         <div class="card-produto">
           <img src="${imgSrc}" alt="${item.nome}">
-          <h3>${item.nome}</h3>
-          <div class="preco">R$ ${preco.toFixed(2)}</div>
-          <button class="btn-comprar" onclick="addToCart('${(item.nome||'').replace(/'/g,"\\'")}', '${preco.toFixed(2)}')">Comprar</button>
+          <div class="card-conteudo" style="margin-top: auto;">
+            <h3>${item.nome}</h3>
+            <div class="preco">R$ ${preco.toFixed(2)}</div>
+            <button class="btn-comprar" onclick="addToCart('${(item.nome||'').replace(/'/g,"\'")}', '${preco.toFixed(2)}')">Comprar</button>
+          </div>
         </div>
       `;
     });
