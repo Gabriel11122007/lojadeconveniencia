@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Fonte do header (Lobster) -->
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<!-- Header CSS (fallbacks) -->
+<link rel="stylesheet" href="comeco/header.css">
+
+<!-- Tema da Página -->
+<style>
+
+
+
+
+
+
+
+
+
+
+.cart-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 350px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 12px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-panel.open {
+  right: 0;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-cart {
+  background: red;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  margin: 15px 0;
+}
+
+.cart-item {
+  border-bottom: 1px solid #ccc;
+  padding: 10px 0;
+}
+
+.cart-user-info label {
+  margin-top: 10px;
+  display: block;
+}
+
+.cart-user-info input,
+.cart-user-info select {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0 10px;
+}
+
+.finish-order {
+  background: green;
+  color: #fff;
+  border: none;
+  padding: 15px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.open-cart-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #222;
+  color: #fff;
+  border: none;
+  padding: 15px 20px;
+  font-size: 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  z-index: 9999;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:root {
+  --site-scale: clamp(0.6, calc(0.5 + (100vw / 1600)), 1);
+  --base-font: calc(16px * var(--site-scale));
+
+  --page-bg: #ebe4d5;
+  --header-bg: var(--page-bg);
+
+  --accent: #AB2D0A;
+  --accent-hover: #d4a017;
+  --dark-blue: #0a1a2a;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: var(--page-bg);
+  color: var(--dark-blue);
+  font-size: var(--base-font);
+}
+
+/* Header */
+header {
+  background: var(--header-bg);
+  padding: 20px;
+  text-align: center;
+  color: white;
+  font-size: calc(var(--base-font) * 1.5);
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Títulos */
+.section-title {
+  font-size: calc(var(--base-font) * 1.4);
+  margin: 25px 0 10px 20px;
+  color: var(--accent);
+}
+
+/* ============================
+   CARROSSEL DE PROMOÇÕES
+============================ */
+#promoCarousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 20px;
+  scroll-behavior: smooth;
+}
+
+.carousel-item {
+  min-width: 160px; /* reduced size for more compact promo cards */
+  max-width: 200px;
+  background: var(--dark-blue);
+  color: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+  transition: transform 0.18s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.carousel-item:hover {
+  transform: scale(1.05);
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 110px; /* fixed smaller height for compact cards */
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.carousel-item h3 {
+  font-size: calc(var(--base-font) * 0.95);
+  margin: 8px 0 6px;
+}
+
+.carousel-item p {
+  font-size: calc(var(--base-font) * 0.85);
+  margin: 4px 0;
+}
+
+.carousel-item .botao-comprar {
+  padding: 8px 10px;
+  font-size: calc(var(--base-font) * 0.85);
+}
+
+/* ============================
+   LISTA DE PRODUTOS
+============================ */
+#ListaProdutos {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.card-produto {
+  background: #fff;
+  border-radius: 14px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  text-align: center;
+  border: 2px solid var(--accent);
+  transition: transform 0.25s ease;
+}
+
+.card-produto:hover {
+  transform: scale(1.03);
+}
+
+.card-produto img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.card-produto h3 {
+  margin: 10px 0 6px;
+  font-size: calc(var(--base-font) * 1.1);
+}
+
+.preco {
+  color: var(--accent);
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: calc(var(--base-font) * 1.2);
+}
+
+/* Botão */
+.botao-comprar,
+.btn-comprar {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.botao-comprar:hover,
+.btn-comprar:hover {
+  background: var(--accent-hover);
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- Include in <head>:
+<link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="header.css">  <-- optional external file
+-->
+<!-- ===== HEADER MARCELINO'S ===== -->
+<header class="site-header w-full shadow-md fixed top-0 left-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+    
+    <!-- Logo -->
+    <h1 class="text-3xl font-bold font-[Lobster] ">
+      Marcelino's
+    </h1>
+
+    <!-- Botão do menu mobile -->
+    <button id="menu-toggle" class="md:hidden text-yellow-400 focus:outline-none text-3xl">
+      ☰
+    </button>
+
+    <!-- Navegação -->
+   <nav id="menu" class="hidden md:flex flex-wrap items-center gap-3 text-lg font-semibold">
+  <a href="teste_pagina.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Home</a>
+  <a href="produto.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Produtos</a>
+ <a href="../avaliacao.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Avaliação</a>
+<a href="../cadastro/login.html" class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition">Login</a>
+
+<button id="logoutBtn"
+class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition text-white">
+Logout
+</button>
+
+</nav>
+
+  </div>
+
+  <!-- Menu colapsável (mobile) -->
+  <div id="mobile-menu" class="hidden flex-col items-center bg-[#7B4B24] md:hidden pb-4">
+ <a href="teste_pagina.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Home</a>
+  <a href="produto.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Produtos</a>
+  <a href="../avaliacao.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Avaliação</a>
+<a href="../cadastro/login.html" class="block w-full text-center py-2 border-b border-[#985600] hover:bg-[#985600]">Login</a>
+
+<button id="logoutBtn"
+class="px-4 py-2 rounded-lg bg-[#AB2D0A] hover:bg-[#d4a017] transition text-white">
+Logout
+</button>
+  </div>
+</header>
+<script>
+// =============== MENU HAMBÚRGUER ===============
+document.addEventListener("DOMContentLoaded", () => {
+  const menu = document.getElementById("menu");               // menu desktop
+  const mobileMenu = document.getElementById("mobile-menu");  // menu mobile
+  const menuToggle = document.getElementById("menu-toggle");  // botão hambúrguer
+
+  if (!menuToggle || !mobileMenu) {
+    console.error("Erro: IDs 'menu-toggle' ou 'mobile-menu' não encontrados.");
+    return;
+  }
+
+  // Abre / Fecha o menu mobile
+  menuToggle.addEventListener("click", (event) => {
+    event.stopPropagation(); // evita fechar ao clicar no próprio botão
+    mobileMenu.classList.toggle("hidden");
+  });
+
+  // Fecha ao clicar nos links
+  mobileMenu.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", () => {
+      mobileMenu.classList.add("hidden");
+    });
+  });
+
+  // Fecha ao clicar fora
+  document.addEventListener("click", (event) => {
+    const clickedOutsideButton = !menuToggle.contains(event.target);
+    const clickedOutsideMenu = !mobileMenu.contains(event.target);
+
+    if (clickedOutsideButton && clickedOutsideMenu) {
+      mobileMenu.classList.add("hidden");
+    }
+  });
+});
+</script>
+
+<script>
+// ====== TROCA DE LOGIN / LOGOUT ======
+
+const loginBtn = document.querySelector('a[href="../cadastro/login.html"]');
+const logoutBtn = document.getElementById("logoutBtn");
+
+// Se estiver logado
+function atualizarHeader() {
+  const isLoggedIn = localStorage.getItem("usuario_id");
+
+  if (isLoggedIn) {
+    // Usuário logado → mostra Logout, esconde Login
+    if (loginBtn) loginBtn.style.display = "none";
+    if (logoutBtn) logoutBtn.style.display = "block";
+  } else {
+    // Usuário NÃO logado → mostra Login, esconde Logout
+    if (loginBtn) loginBtn.style.display = "block";
+    if (logoutBtn) logoutBtn.style.display = "none";
+  }
+}
+
+atualizarHeader();
+
+// ====== FUNÇÃO DE LOGOUT =======
+function logout() {
+  localStorage.removeItem("usuario_id");
+  localStorage.removeItem("emailUsuario");
+  localStorage.removeItem("nomeUsuario");
+  localStorage.removeItem("isLoggedIn");
+
+  alert("Você saiu com sucesso!");
+
+  window.location.reload(); // Força atualizar o header
+}
+
+logoutBtn.addEventListener("click", logout);
+</script>
+<!-- After the fixed header, include a spacer to prevent content being hidden under it: -->
+<div style="height:80px;"></div>
+
+
+<h1 class="section-title">Promoções do Dia</h1>
+<div id="promoCarousel"></div>
+
+<h1 class="section-title">Todos os Produtos</h1>
+<div id="ListaProdutos"></div>
+
+ <!-- Carrinho Interno -->
+<div id="cartPanel" class="cart-panel">
+  <div class="cart-header">
+    <h2>Carrinho</h2>
+    <button id="closeCart" class="close-cart">X</button>
+  </div>
+
+  <div id="cartItems" class="cart-items"></div>
+
+  <div class="cart-user-info">
+    <label>Nome:</label>
+    <input type="text" id="userName" placeholder="Seu nome">
+
+    <label>Endereço:</label>
+    <input type="text" id="userAddress" placeholder="Seu endereço">
+
+    <label>Forma de Pagamento:</label>
+    <select id="paymentMethod">
+      <option value="Cartão">Cartão</option>
+      <option value="Dinheiro">Dinheiro</option>
+      <option value="PIX">PIX</option>
+    </select>
+  </div>
+
+  <button id="finishOrder" class="finish-order">Finalizar Pedido</button>
+</div>
+
+<!-- Botão para abrir o carrinho -->
+<button id="openCart" class="open-cart-btn">🛒 Carrinho</button>
+
+      <section class="banner-carousel-container" aria-label="Carrossel de banners" style="width:100%; max-width:1100px; margin: 30px auto;">
+        <button class="arrow left" id="bannerPrev" aria-label="Banner anterior" style="background:var(--accent); display: none;">&#10094;</button>
+        <div class="banner-carousel" id="bannerCarousel" role="list" aria-live="polite" style="padding:8px 48px;"></div>
+        <button class="arrow right" id="bannerNext" aria-label="Próximo banner" style="background:var(--accent); display: none;">&#10095;</button>
+      </section>
+
+       <div class="faq-container" style="width: 70%; margin: 50px auto; display: flex; flex-direction: column; align-items: center;  padding: 30px 20px; border-radius: 12px; margin-top: 10vw; margin-bottom: 10vw;">
+
+    <div id="faqQ" style="width: 100%;"></div>
+  </div>
+
+
+<script type="module">
+/* =========================
+   CONFIGURAÇÃO SUPABASE
+========================= */
+        const SUPABASE_URL ='https://ulxbfffiidjlartupase.supabase.co';
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseGJmZmZpaWRqbGFydHVwYXNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDg5OTYsImV4cCI6MjA3MjU4NDk5Nn0.f3-wyXvWJtYR12sWD8bZNW0rFxmz-xq0BT8yuc8boWQ";
+
+        const supabase = globalThis.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* =========================
+   PROMOÇÕES
+========================= */
+
+const nsei = document.getElementById('promoCarousel');
+
+async function carregarProdutosPromocao() {
+  try {
+    const { data, error } = await supabase
+      .from('promocao')
+      .select(`desconto, item:item_id(*)`);
+
+    if (error) {
+      console.error('Erro ao buscar promoções:', error);
+      nsei.innerHTML = '<p style="padding:20px; color: #8b0000;">Erro ao carregar promoções.</p>';
+      return;
+    }
+
+    if (!data || !data.length) {
+      nsei.innerHTML = '<p style="padding:20px;">Nenhuma promoção encontrada.</p>';
+      return;
+    }
+
+    nsei.innerHTML = '';
+
+    data.forEach(registro => {
+      const produto = registro.item;
+      const precoOriginal = Number(produto.preco);
+      const precoPromocional = (precoOriginal * (1 - registro.desconto / 100)).toFixed(2);
+
+      const card = document.createElement('div');
+      card.classList.add('carousel-item');
+
+      card.innerHTML = `
+        <img src="${produto.imagem}" alt="${produto.nome}">
+        <h3>${produto.nome}</h3>
+        <p style="color:#fff;">${produto.descricao || ""}</p>
+        <p>
+          <span style="text-decoration: line-through; opacity:0.8">R$ ${precoOriginal.toFixed(2)}</span><br>
+          <strong style="color:var(--accent-hover); font-size:1.2em;">R$ ${precoPromocional}</strong>
+        </p>
+        <button class="botao-comprar" onclick="addToCart('${produto.nome}', '${precoPromocional}')">Comprar</button>
+      `;
+
+      nsei.appendChild(card);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+
+// FUNÇÃO PARA CARREGAR TODOS OS PRODUTOS (EXCETO OS PROMOCIONAIS)
+// FUNÇÃO CORRIGIDA E COMPLETA
+async function carregarTodosOsProdutos() {
+  // 💡 ATENÇÃO: Confirme se este ID 'ListaProdutos' está no seu HTML!
+  const container = document.getElementById('ListaProdutos'); 
+  if (!container) {
+    console.error("Container com ID 'ListaProdutos' não encontrado no HTML.");
+    return;
+  }
+  container.innerHTML = '<p style="text-align:center;">Carregando produtos não promocionais...</p>';
+
+  try {
+    // 1. OBTÉM OS IDs DOS ITENS EM PROMOÇÃO
+    const { data: promoData, error: promoError } = await supabase
+      .from('promocao')
+      .select('item_id');
+
+    if (promoError) {
+      console.error('Erro ao buscar IDs de promoção:', promoError);
+      container.innerHTML = '<p style="color: red; text-align:center;">Erro ao carregar lista de promoções.</p>';
+      return;
+    }
+
+    const itemIdsEmPromocao = promoData.map(p => p.item_id);
+
+    // 2. BUSCA TODOS OS ITENS, EXCLUINDO OS IDs PROMOCIONAIS
+    let query = supabase.from('item').select('*');
+
+    if (itemIdsEmPromocao.length > 0) {
+      const idList = itemIdsEmPromocao.join(',');
+      // 🔑 FILTRO CHAVE: Exclui todos os IDs que estão na lista de promoções
+      query = query.not('id_item', 'in', `(${idList})`); 
+    }
+
+    const { data: allItemsData, error: allItemsError } = await query;
+
+    if (allItemsError) {
+      console.error('Erro ao carregar todos os produtos:', allItemsError);
+      container.innerHTML = '<p style="color: red; text-align:center;">Erro ao carregar todos os produtos.</p>';
+      return;
+    }
+
+    if (!allItemsData || allItemsData.length === 0) {
+      container.innerHTML = '<p style="text-align:center;">Nenhum produto não promocional encontrado.</p>';
+      return;
+    }
+
+    // 3. RENDERIZAÇÃO DOS PRODUTOS
+    container.innerHTML = '';
+    allItemsData.forEach(item => {
+      const imgSrc = item.imagem || 'https://via.placeholder.com/300x180?text=Sem+Imagem';
+      const preco = Number(item.preco) || 0;
+      
+      container.innerHTML += `
+        <div class="card-produto">
+          <img src="${imgSrc}" alt="${item.nome}">
+          <h3>${item.nome}</h3>
+          <div class="preco">R$ ${preco.toFixed(2)}</div>
+          <button class="btn-comprar" onclick="addToCart('${(item.nome||'').replace(/'/g,"\\'")}', '${preco.toFixed(2)}')">Comprar</button>
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error('Erro geral ao carregar todos os produtos:', err);
+    container.innerHTML = '<p style="color: red; text-align:center;">Ocorreu um erro inesperado ao carregar produtos.</p>';
+  }
+}
+/* =========================
+   INICIAR PÁGINA
+========================= */
+// Verifica conexão com Supabase e mostra status visível na página
+async function checkSupabase() {
+  const statusEl = document.getElementById('supabaseStatus');
+  try {
+    const { data, error } = await supabase.from('item').select('id_item').limit(1);
+
+    if (error) {
+      console.error('Erro ao testar conexão Supabase:', error);
+    
+      statusEl.style.color = '#8b0000';
+      return false;
+    }
+
+    statusEl.textContent = 'Conexão com Supabase OK.';
+    statusEl.style.color = 'green';
+    return true;
+  } catch (err) {
+    console.error('Exceção ao testar Supabase:', err);
+    statusEl.textContent = 'Erro de rede ao conectar ao Supabase (veja console).';
+    statusEl.style.color = '#8b0000';
+    return false;
+  }
+}
+
+// Primeiro verifica conexão, depois carrega dados
+checkSupabase().then(ok => {
+  if (ok) {
+    carregarProdutosPromocao();
+
+    
+  } else {
+    // Ainda tenta carregar para que erros detalhados apareçam no console
+    carregarProdutosPromocao();
+
+  }
+});
+// =========================
+// CARRINHO LOCAL STORAGE
+// =========================
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
+
+function addToCart(itemName, itemPrice) {
+  const existingItem = cart.find(item => item.name === itemName);
+  
+  if (existingItem) {
+    existingItem.qty += 1;
+  } else {
+    cart.push({ name: itemName, price: parseFloat(itemPrice), qty: 1 });
+  }
+  
+  saveCart();
+  document.getElementById("cartPanel").classList.add("open");
+}
+
+function renderCart() {
+  const container = document.getElementById("cartItems");
+  container.innerHTML = "";
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    const itemTotal = item.price * item.qty;
+    total += itemTotal;
+    
+    container.innerHTML += `
+      <div class="cart-item">
+        <strong>${item.name}</strong><br>
+        R$ ${parseFloat(item.price).toFixed(2)}<br>
+        <div style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+          <button onclick="decreaseQty(${index})" style="background: #AB2D0A; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">-</button>
+          <span style="font-weight: bold; min-width: 30px; text-align: center;">${item.qty}</span>
+          <button onclick="increaseQty(${index})" style="background: #AB2D0A; color: #fff; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px;">+</button>
+          <span style="margin-left: auto; font-weight: bold;">R$ ${itemTotal.toFixed(2)}</span>
+        </div>
+        <button onclick="removeCartItem(${index})" style="background: red; color: #fff; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 8px;">Remover</button>
+      </div>
+    `;
+  });
+
+  container.innerHTML += `
+    <div style="border-top: 2px solid #ccc; margin-top: 15px; padding-top: 15px; font-weight: bold; font-size: 18px; text-align: right;">
+      Total: R$ ${total.toFixed(2)}
+    </div>
+  `;
+}
+
+function increaseQty(index) {
+  cart[index].qty += 1;
+  saveCart();
+}
+
+function decreaseQty(index) {
+  if (cart[index].qty > 1) {
+    cart[index].qty -= 1;
+    saveCart();
+  } else {
+    removeCartItem(index);
+  }
+}
+
+function removeCartItem(index) {
+  cart.splice(index, 1);
+  saveCart();
+}
+
+// =========================
+// ABRIR/FECHAR CARRINHO
+// =========================
+document.getElementById("openCart").onclick = () => {
+  document.getElementById("cartPanel").classList.add("open");
+};
+
+document.getElementById("closeCart").onclick = () => {
+  document.getElementById("cartPanel").classList.remove("open");
+};
+
+// =========================
+// FINALIZAR PEDIDO VIA WHATSAPP
+// =========================
+document.getElementById("finishOrder").onclick = () => {
+  const name = document.getElementById("userName").value.trim();
+  const address = document.getElementById("userAddress").value.trim();
+  const payment = document.getElementById("paymentMethod").value;
+
+  if (!name || !address) {
+    alert("Preencha nome e endereço!");
+    return;
+  }
+
+  if (cart.length === 0) {
+    alert("O carrinho está vazio!");
+    return;
+  }
+
+  let message = `*NOVO PEDIDO*\n\n`;
+  message += `*Cliente:* ${name}\n`;
+  message += `*Endereço:* ${address}\n`;
+  message += `*Pagamento:* ${payment}\n\n`;
+  message += `*Itens:*\n`;
+  let total = 0;
+
+  cart.forEach(item => {
+    const itemTotal = item.price * item.qty;
+    total += itemTotal;
+    message += `- ${item.name} (${item.qty}x R$ ${item.price.toFixed(2)} = R$ ${itemTotal.toFixed(2)})\n`;
+  });
+
+  message += `\n*Total: R$ ${total.toFixed(2)}*`;
+
+  const phone = "5516997795333";
+  const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+  window.open(url, "_blank");
+};
+
+// render inicial
+renderCart();
+// Expor funções no escopo global para que handlers inline (onclick) funcionem
+window.addToCart = addToCart;
+window.increaseQty = increaseQty;
+window.decreaseQty = decreaseQty;
+window.removeCartItem = removeCartItem;
+// Localize este bloco no final do seu arquivo, dentro da tag <script type="module">
+
+    carregarProdutosPromocao(); 
+    // ...
+    
+    // 🔑 ESTA LINHA DEVE ESTAR AQUI
+    carregarTodosOsProdutos(); 
+
+</script>
+
+<!-- Header JS (menu toggle) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+
+</body>
+</html>
